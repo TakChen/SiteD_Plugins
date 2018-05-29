@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<site ver="2" debug="1" engine="17" >
+    <ua></ua>
+    <url>http://pic.yesky.com/girl/</url>
+    <author>苹果老司机</author>
+    <title>天极美女图片</title>
+    <intro>[图片]美女图片,性感美女,美腿,模特,气质,日韩,车模,模特</intro>
+    <expr>pic\.yesky\.com</expr>
+    <logo></logo>
+    <guid>81c972395b724754b295f6a4827054f5</guid>
+    <encode>gb2312</encode>
+    <main dtype="4" dtag="图片">
+
+        <home>
+            <hots title="最新" method="get"   w="3"  h="4"  parse="hots_parse" showImg="2" url="http://pic.yesky.com/c/6_20491.shtml" />
+            <tags title="更多美女" method="get" showImg="1" >
+                <item title="尤果网" url="http://pic.yesky.com/c/6_22171.shtml" />
+                <item title="美空网" url="http://pic.yesky.com/c/6_22191.shtml" />
+                <item title="推女神" url="http://pic.yesky.com/c/6_22231.shtml" />
+                <item title="气质" url="http://pic.yesky.com/c/6_20472.shtml" />
+                <item title="萌女" url="http://pic.yesky.com/c/6_20473.shtml" />
+                <item title="校花" url="http://pic.yesky.com/c/6_20475.shtml" />
+                <item title="婚纱" url="http://pic.yesky.com/c/6_20476.shtml" />
+                <item title="街拍" url="http://pic.yesky.com/c/6_20477.shtml" />
+                <item title="非主流" url="http://pic.yesky.com/c/6_20474.shtml" />
+                <item title="美腿" url="http://pic.yesky.com/c/6_20498.shtml" />
+                <item title="清纯" url="http://pic.yesky.com/c/6_20471.shtml" />
+                <item title="性感" url="http://pic.yesky.com/c/6_20771.shtml" />
+                <item title="日韩" url="http://pic.yesky.com/c/6_21251.shtml" />
+                <item title="车模" url="http://pic.yesky.com/c/6_22171.shtml" />
+                <item title="模特" url="http://pic.yesky.com/c/6_20671.shtml" />
+                <item title="女神图片" url="http://pic.yesky.com/c/6_61091.shtml" />
+                <item title="美女诱惑" url="http://pic.yesky.com/c/6_20491.shtml" />
+            </tags>
+
+        </home>
+        <tag cache="0"  method="get"  w="3" h="4" buildUrl="tag_buildUrl" parse="tag_parse" showImg="1" expr="" />
+        <book cache="0" method="get"  w="3" h="4" parseUrl="book_parseUrl" parse="book_parse"  expr="" />
+
+    </main>
+    <jscript>
+        <require>
+            <item url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio" />
+        </require>
+        <code>
+            <![CDATA[
+
+var SiteD={};
+
+function utf8_decode(str_data) {
+	var tmp_arr = [], i = 0, ac = 0, c1 = 0, c2 = 0, c3 = 0;
+    str_data += '';
+    while ( i < str_data.length ) {
+        c1 = str_data.charCodeAt(i);
+        if (c1 < 128) {
+            tmp_arr[ac++] = String.fromCharCode(c1);
+            i++;
+        } else if ((c1 > 191) && (c1 < 224)) {
+            c2 = str_data.charCodeAt(i+1);
+            tmp_arr[ac++] = String.fromCharCode(((c1 & 31) << 6) | (c2 & 63));
+            i += 2;
+        } else {
+            c2 = str_data.charCodeAt(i+1);
+            c3 = str_data.charCodeAt(i+2);
+            tmp_arr[ac++] = String.fromCharCode(((c1 & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+            i += 3;
+        }
+    }
+    return tmp_arr.join('');
+}
+
+function urla(u) {
+	if(u){
+		var host = "http://pic.91.com";
+		if (u.indexOf("http")<0) {
+			if (u.substr(0, 1) != '/')
+				u = host + '/' + u;
+			else
+				u = host + u;
+		}
+		return encodeURI(u);
+	}
+	return "";
+}
+
+function htmlEsc(obj) {
+	var arrEntities = {
+		'lt': '<',
+		'gt': '>',
+		'nbsp': ' ',
+		'amp': '&',
+		'quot': '"'
+	};
+	for(var i in obj){
+		var str = obj[i];
+		if(typeof(str) == 'object')
+			str = htmlEsc(str);
+		if(typeof(str) != 'string')
+			continue;
+		obj[i] = str.replace(/<[^<>]+?>/g, '').replace(/&(lt|gt|nbsp|amp|quot);/ig, function(all, t) {
+		return arrEntities[t];
+		}).trim();
+	}
+	return obj;
+}
+
+function hots_parse(url, html) {
+
+	var $ = cheerio.load(html);
+	var list=[];
+
+		$('.lb_box dl').each(function(){
+
+		var dd= $(this).children('dd');
+		var img= $(this).find('img');
+
+		var bm = {};
+		bm.name = img.attr('alt');
+		bm.url  = $(this).children('dt').children('a').attr('href');
+		bm.logo = img.attr('src');
+		bm.author = '';
+		bm.newSection = '';
+		bm.updateTime = '';
+		bm.status='';
+
+		list.push(bm);
+	});
+
+
+	return JSON.stringify(list);
+}
+
+function book_parseUrl(url,html)
+{
+
+    var $ = cheerio.load(html);
+	var newUrl='';
+
+    $('.l_effect_bottom li').each(function(){
+		var a = $(this).children('a');
+		newUrl+=a.attr('href')+';';
+		});
+    return newUrl;
+}
+
+function tag_parse(url,html)
+{
+var $ = cheerio.load(html);
+	var list=[];
+		$('.lb_box dl').each(function(){
+		var dd= $(this).children('dd');
+		var img= $(this).find('img');
+		var bm = {};
+		bm.name = img.attr('alt');
+		bm.url  = $(this).children('dt').children('a').attr('href');
+		bm.logo = img.attr('src');
+		bm.author = '';
+		bm.newSection = '';
+		bm.updateTime = '';
+		bm.status='';
+
+		list.push(bm);
+	});
+
+
+	return JSON.stringify(list);
+}
+function book_parse(url,html)
+{
+	var $ = cheerio.load(html);
+
+	if(SiteD.ver && SiteD.ver>=25){
+
+	var list=[];
+
+	$('.l_effect_img_mid').each(function(){
+		var img = $(this).find('img');
+
+		list.push(img.attr('src'));
+
+		});
+		return JSON.stringify(htmlEsc(list));
+    }
+	else
+	{
+	var data = {};
+	data.name = '';
+	data.sections = [];
+
+
+	$('.l_effect_img_mid').each(function(){
+		var img = $(this).find('img');
+
+		var bm = {
+			name: '',
+			url: img.attr('src')
+		};
+        data.sections.push(bm);
+
+		});
+
+	}
+	return JSON.stringify(htmlEsc(data));
+}
+
+
+function tag_buildUrl(url,page){
+	if(page<1)
+		return url;
+	else
+	{
+	    url=url.replace('.shtml','');
+		return url+'_'+page+'.shtml';
+	}
+}
+
+
+    ]]>
+        </code>
+    </jscript>
+</site>

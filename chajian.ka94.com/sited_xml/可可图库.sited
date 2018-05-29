@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<site ver="1" debug="1" engine="17" >
+    <ua></ua>
+    <url>http://www.keketuku.com/</url>
+    <author>苹果老司机</author>
+    <title>可可图库</title>
+    <intro>[图片]全球最漂亮的美女图片排行榜-可可图库</intro>
+    <expr>www\.keketuku\.com</expr>
+    <logo></logo>
+    <guid>6af4c521b924498da1491776deb59416</guid>
+    <encode>utf-8</encode>
+    <main dtype="4" dtag="图片">
+
+        <home>
+            <hots title="首页" method="get" parse="hots_parse"  url="http://www.keketuku.com/" />
+            <updates title="最近更新" method="get" parse="updates_parse" showImg="1" url="http://www.keketuku.com/xiezhen/index.html" />
+            <tags title="更多美女" method="get" showImg="1" >
+                <item group="美女图片" title="写真" url="http://www.keketuku.com/t/index_@page_xz.html" />
+                <item title="清纯" url="http://www.keketuku.com/t/index_@page_qc.html" />
+                <item title="美腿" url="http://www.keketuku.com/t/index_@page_meitui.html" />
+                <item title="模特" url="http://www.keketuku.com/t/index_@page_mote.html" />
+                <item title="性感" url="http://www.keketuku.com/t/index_@page_xg.html" />
+                <item title="爆乳" url="http://www.keketuku.com/t/index_@page_baoru.html" />
+                <item title="私房" url="http://www.keketuku.com/t/index_@page_mx.html" />
+                <item title="明星" url="http://www.keketuku.com/t/index_@page_sf.html" />
+                <item group="美图排行" title="最热门" url="http://www.keketuku.com/top.html" />
+                <item title="排行榜" url="http://www.keketuku.com/list-4-@page.html" />
+            </tags>
+
+        </home>
+        <tag>
+            <tag cache="0"  method="get"   buildUrl="tag_buildUrl" parse="tag_parse" showImg="1" expr="\/t\/index_" />
+            <tag cache="0"  method="get"   parse="tag_parse" showImg="1" expr="\/top\.html" />
+            <tag cache="0"  method="get"   parse="tag_parse" showImg="1" expr="\/list" />
+        </tag>
+        <book cache="0" method="get"   parseUrl="book_parseUrl" parse="book_parse"  expr="" />
+
+    </main>
+    <jscript>
+        <require>
+            <item url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio" />
+        </require>
+        <code>
+            <![CDATA[
+
+var SiteD={};
+
+function utf8_decode(str_data) {
+	var tmp_arr = [], i = 0, ac = 0, c1 = 0, c2 = 0, c3 = 0;
+    str_data += '';
+    while ( i < str_data.length ) {
+        c1 = str_data.charCodeAt(i);
+        if (c1 < 128) {
+            tmp_arr[ac++] = String.fromCharCode(c1);
+            i++;
+        } else if ((c1 > 191) && (c1 < 224)) {
+            c2 = str_data.charCodeAt(i+1);
+            tmp_arr[ac++] = String.fromCharCode(((c1 & 31) << 6) | (c2 & 63));
+            i += 2;
+        } else {
+            c2 = str_data.charCodeAt(i+1);
+            c3 = str_data.charCodeAt(i+2);
+            tmp_arr[ac++] = String.fromCharCode(((c1 & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+            i += 3;
+        }
+    }
+    return tmp_arr.join('');
+}
+
+function urla(u) {
+	if(u){
+		var host = "http://www.keketuku.com";
+		if (u.indexOf("http")<0) {
+			if (u.substr(0, 1) != '/')
+				u = host + '/' + u;
+			else
+				u = host + u;
+		}
+		return encodeURI(u);
+	}
+	return "";
+}
+
+function htmlEsc(obj) {
+	var arrEntities = {
+		'lt': '<',
+		'gt': '>',
+		'nbsp': ' ',
+		'amp': '&',
+		'quot': '"'
+	};
+	for(var i in obj){
+		var str = obj[i];
+		if(typeof(str) == 'object')
+			str = htmlEsc(str);
+		if(typeof(str) != 'string')
+			continue;
+		obj[i] = str.replace(/<[^<>]+?>/g, '').replace(/&(lt|gt|nbsp|amp|quot);/ig, function(all, t) {
+		return arrEntities[t];
+		}).trim();
+	}
+	return obj;
+}
+
+function hots_parse(url, html) {
+
+	var $ = cheerio.load(html);
+	var list=[];
+
+		$('.item').each(function(){
+
+		var img = $(this).find('img');
+		var txt= img.parent();
+		var bm = {};
+		bm.name = txt.text();
+		bm.url  = urla(img.parent().attr('href'));
+		bm.logo = img.attr('src');
+		bm.author = '';
+		bm.newSection = '';
+		bm.updateTime = '';
+		bm.status='';
+
+		list.push(bm);
+	});
+
+
+	return JSON.stringify(list);
+}
+
+function updates_parse(url, html) {
+
+	var $ = cheerio.load(html);
+	var list=[];
+
+		$('.item').each(function(){
+
+		var img = $(this).find('img');
+		var txt= img.parent();
+		var bm = {};
+		bm.name = txt.text();
+		bm.url  = urla(img.parent().attr('href'));
+		bm.logo = img.attr('src');
+		bm.author = '';
+		bm.newSection = '';
+		bm.updateTime = '';
+		bm.status='';
+
+		list.push(bm);
+	});
+
+
+	return JSON.stringify(list);
+}
+
+function tag_buildUrl(url,page)
+{
+     if(page<2)
+           url=url.replace('@page_','');
+            else url = url.replace('@page',page);
+           return url;
+
+}
+
+function tag_parse(url, html) {
+
+	var $ = cheerio.load(html);
+	var list=[];
+
+		$('.item').each(function(){
+
+		var img = $(this).find('img');
+		var txt= img.parent();
+		var bm = {};
+		bm.name = txt.text();
+		bm.url  = urla(img.parent().attr('href'));
+		bm.logo = img.attr('src');
+		bm.author = '';
+		bm.newSection = '';
+		bm.updateTime = '';
+		bm.status='';
+
+		list.push(bm);
+	});
+
+
+	return JSON.stringify(list);
+}
+
+function book_parse(url,html)
+{
+
+	var $ = cheerio.load(html);
+
+	if(SiteD.ver && SiteD.ver>=25){
+
+	var list=[];
+
+	$('.content-pic a').each(function(){
+		var img = $(this).children('img');
+           list.push(img.attr('src'));
+
+		});
+		return JSON.stringify(htmlEsc(list));
+    }
+	else
+	{
+	var data = {};
+	data.name = '';
+	data.sections = [];
+
+
+	$('.content-pic a').each(function(){
+		var img = $(this).find('img');
+
+		var bm = {
+			name: '',
+			url: img.attr('src')
+		};
+        data.sections.push(bm);
+
+		});
+
+	}
+	return JSON.stringify(htmlEsc(data));
+}
+
+function book_parseUrl(url,html)
+{
+
+    var $ = cheerio.load(html);
+    var newUrls=url+';';
+
+            var a=html.match(/共(.+?)页/);
+            if(a==null)return url;
+            var pageCount=parseInt(a[1]);
+            var baseUrl=url.replace('.html','');
+            for(i=0;i<pageCount-1;i++)
+            {
+            newUrls+=baseUrl+'_'+(i+2)+'.html';
+            if(i<pageCount-2)newUrls+=';';
+            }
+            return newUrls;
+
+}
+
+    ]]>
+        </code>
+    </jscript>
+</site>

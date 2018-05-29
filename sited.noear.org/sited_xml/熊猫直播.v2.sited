@@ -1,0 +1,170 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<site ver="2" debug="1" engine="24" >
+    <ua></ua>
+	<title>熊猫直播</title>
+	<author>Guang</author>	
+    <intro>[直播]提供高清、流畅的视频、活动、赛事直播服务，不仅包含英雄联盟lol直播，炉石传说直播，dota2直播等游戏直播，更有大型活动直播、演唱会直播、美女直播。能搜索节目，不能搜索主播。</intro>
+    <url>http://m.panda.tv/</url>
+    <expr>\.panda\.tv</expr>
+    <logo></logo>
+    <encode>UTF-8</encode>
+    <main dtype="7" btag="直播">
+		<reward title="打赏" mail="wistn@qq.com">
+			<item txt="插件开发者@Guang的账号" />
+			<item />
+			<item title="支付宝[❤❤广]" url="wistn@qq.com" />
+			<item />
+			<item txt="感谢你对此插件开发者的支持"/>
+		</reward>
+        <home>
+            <updates cache="30m" showImg="2" w="1.77" h="1"  title="热播" method="get" parse="updates_parse" url="http://api.m.panda.tv/ajax_get_live_list_by_multicate?hotroom=1&amp;__plat=h5" />
+            <tags title="分类">
+	            <tags cache="1d" method="get" parse="tags_parse" url="http://api.m.panda.tv/index.php?method=category.list&amp;type=game"/>
+            </tags>
+        </home>
+        <search cache="1d"  method="get"  parse="search_parse" url="http://www.panda.tv/ajax_search?order_cond=fans&amp;pageno=1&amp;name=@key&amp;pagenum=20"  />
+        <tag cache="0" method="get" parse="tag_parse" />
+        <book cache="1d"  method="get" parse="book_parse" buildUrl="book_buildurl" expr="id=\d+" header="cookie;referer" />
+    </main>
+    <jscript>
+	    <require>
+			<item url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio" />
+		</require>
+        <code>
+            <![CDATA[
+function urla(u) {
+	var host = "http://m.panda.tv";
+	if (u.indexOf("http") < 0) {
+		if (u.substr(0, 1) != '/')
+			u = host + '/' + u;
+		else
+			u = host + u;
+	}
+	return encodeURI(u);
+}
+
+
+function updates_parse(url, html) {
+	var json = JSON.parse(html);
+	var list = [];
+
+	for (var i in json.data) {
+		for (var j in json.data[i].items) {
+			var item = json.data[i].items[j];
+			if (item.id) {
+				var bm = {};
+				bm.name = item.name;
+				bm.url = 'http://m.panda.tv/room.html?roomid=' + item.id;
+				bm.logo = item.pictures.img;
+				bm.newSection = '';
+				if(item.status=='3'){var status='休息中';}
+				else if(item.status=='2'){var status='直播中';}
+				bm.updateTime = item.userinfo.nickName +status;
+				list.push(bm);
+			}
+		}
+	}
+	return JSON.stringify(list);
+}
+
+function tags_parse(url, html) {
+	var json = JSON.parse(html);
+	var list = [];
+
+	list[0] = {
+		group : '娱乐',
+		title : '熊猫星秀',
+		url : 'http://api.m.panda.tv/ajax_get_live_list_by_cate?cate=yzdr&pageno=@page&pagenum=10&__plat=h5'
+	};
+	list[1] = {
+		title : '户外直播',
+		url : 'http://api.m.panda.tv/ajax_get_live_list_by_cate?cate=hwzb&pageno=@page&pagenum=10&__plat=h5'
+	};
+	list[2] = {
+		title : '音乐专区',
+		url : 'http://api.m.panda.tv/ajax_get_live_list_by_cate?cate=music&pageno=@page&pagenum=10&__plat=h5'
+	};
+
+	var bm = null;
+	for (var i in json.data) {
+		var item = json.data[i];
+		if (item.ename) {
+			if (bm) {
+				bm = {};
+			} else {
+				bm = {
+					group : "游戏"
+				};
+			}
+			bm.title = item.cname;
+			bm.url = 'http://api.m.panda.tv/ajax_get_live_list_by_cate?cate=' + item.ename + '&pageno=@page&pagenum=10&__plat=h5';
+
+			list.push(bm);
+		}
+	}
+
+	return JSON.stringify(list);
+}
+
+function tag_parse(url, html) {
+	var json = JSON.parse(html);
+	var list = [];
+
+	for (var i in json.data.items) {
+		var item = json.data.items[i];
+		if (item.id) {
+			var bm = {};
+			bm.name = item.name;
+			bm.url = 'http://m.panda.tv/room.html?roomid=' + item.id;
+			bm.logo = item.pictures.img;
+			bm.newSection = '';
+			if(item.status=='3'){var status='休息中';}
+			else if(item.status=='2'){var status='直播中';}
+			bm.updateTime = item.userinfo.nickName +status;
+			bm.author = '';
+			bm.status = '';
+
+			list.push(bm);
+		}
+	}
+	return JSON.stringify(list);
+}
+
+function search_parse(url,html) {
+	var json = JSON.parse(html);
+	var list = [];
+
+	for (var i in json.data.items) {
+		var item = json.data.items[i];
+		if (item.roomid) {
+			var bm = {};
+			bm.name = item.name;
+			bm.url = 'http://m.panda.tv/room.html?roomid=' + item.roomid;
+			bm.logo = item.pictures.img;
+			bm.newSection = '';
+			if(item.status=='3'){var status='休息中';}
+			else if(item.status=='2'){var status='直播中';}
+			bm.updateTime = item.nickname +status;
+			bm.author = '';
+			bm.status = '';
+			bm.btag = "直播";
+			list.push(bm);
+		}
+	}
+
+return JSON.stringify(list);
+}
+
+function book_buildurl(url) {
+	var id = url.match(/(\d+)/i)[1];
+	return "http://room.api.m.panda.tv/index.php?method=room.shareapi&roomid=" + id;
+}
+
+function book_parse(url, html) {
+	var json = JSON.parse(html);
+	return json.data.videoinfo.address;
+}
+    ]]>
+        </code>
+    </jscript>
+</site>

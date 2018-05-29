@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<site ver="1" debug="1" engine="12">
+    <ua></ua>
+    <title>TenManga</title>
+    <intro>Read Free Manga Online at Ten Manga</intro>
+    <author>seiya</author>
+    <url>http://www.tenmanga.com</url>
+    <expr>\.tenmanga\.com</expr>
+    <logo></logo>
+	<encode>utf-8</encode>
+	<main dtype="1">
+		<reward title="反馈" mail="seiya@noear.org">
+			<item txt="如果有问题，请用邮件反馈：" />
+			<item />
+			<item txt="seiya@noear.org"/>
+		</reward>
+		
+		<home>
+        	<hots cache="1d" title="Hot" method="get" parse="hots_parse" url="http://www.tenmanga.com/" >
+	        	<updates parse="updates_parse" />
+	        	<tags parse="tags_parse" />
+        	</hots>
+            <updates title="Updates" />
+			<tags title="Tags" />
+		</home>
+		<search cache="1d"  method="get" parse="search_parse" url="http://www.tenmanga.com/search/?wd=@key"/>
+		<tag     cache="0"  method="get" parse="tag_parse" header="Accept=*/*;X-Requested-With=XMLHttpRequest" />
+		
+        <book    cache="1d" method="get" parse="book_parse" expr="manga-" />
+        <section cache="1"  method="get" parse="section_parse" parseUrl="section_parseUrl" header="cookie;referer"  />
+    </main>
+    <jscript>
+	    <require>
+			<item url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio" />
+		</require>
+		<code>
+        <![CDATA[
+
+function urla(u) {
+	var host = "http://www.tenmanga.com";
+	if (u.indexOf("http")<0) {
+		if (u.substr(0, 1) != '/')
+			u = host + '/' + u;
+		else
+			u = host + u;
+	}
+	return encodeURI(u);
+}
+
+function hots_parse(url,html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('.tab_content li').each(function(){
+		var slf  = $(this);
+		
+		var img = slf.find('img');
+		
+		var bm = {};
+		bm.name = img.parent().attr('title');
+		bm.url  = urla(img.parent().attr('href'));
+		bm.logo = urla(img.attr('src'));
+		
+		list.push(bm);
+	});
+
+	return JSON.stringify(list);
+}
+function updates_parse(url,html) {
+    var $ = cheerio.load(html);
+	var list = [];
+	
+	$('.middle-box dl').each(function(){
+		var slf  = $(this);
+		
+		var al = slf.find('a').eq(0);
+		
+		var bm = {};
+		bm.name = al.attr('title');
+		bm.url  = urla(al.attr('href'));
+		bm.updateTime = slf.find('i').eq(0).text();
+        bm.newSection = slf.find('a').last().text();
+
+		list.push(bm);
+	});
+
+	return JSON.stringify(list);
+}
+
+function tags_parse(url,html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('.random-content a.category-link').each(function(idx){
+		if(idx<30){
+			return;
+		}
+		
+		var slf  = $(this);
+		
+		var bm = {};
+		bm.title = slf.text();
+		bm.url  = 'http://www.tenmanga.com/ajax/category/category-'+bm.title+'-sort-views-page-@page';
+		
+		list.push(bm);
+	});
+
+	return JSON.stringify(list);
+}
+
+
+function search_parse(url,html) {
+    var $ = cheerio.load(html);
+	var list = [];
+	
+	$('#list_container li').each(function(){
+		var img = $(this).find('img');
+		
+		var bm = {};
+		bm.name = img.parent().attr('title');
+		bm.url = urla(img.parent().attr('href'));
+		bm.logo = urla(img.attr('src'));
+		
+		bm.author = '';
+		bm.newSection = $(this).find('.chapter a').text();
+		bm.updateTime = '';
+		bm.status = '';
+		list.push(bm);
+	});
+
+	return JSON.stringify(list);
+}
+
+function tag_parse(url,html){
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('li').each(function(){
+		var img = $(this).find('img');
+		
+		var bm = {};
+		bm.name = img.parent().attr('title');
+		bm.url = urla(img.parent().attr('href'));
+		bm.logo = urla(img.attr('src'));
+		
+		bm.author = '';
+		bm.newSection = $(this).find('.chapter a').text();
+		bm.updateTime = '';
+		bm.status = '';
+		list.push(bm);
+	});
+
+	return JSON.stringify(list);
+}
+
+
+function book_parse(url, html) {
+	var $ = cheerio.load(html);
+	
+    var data={};
+
+    data.name = $('.book-info h1').text();
+    data.author = $('.about-book  a').eq(0).text();
+    data.logo = $('.book-info img').attr('src');
+    data.intro = $('.short-info  span').text();
+    data.updateTime = "";
+    data.sections = [];
+
+    $('.chapter-box li').each(function(){
+	    var slf = $(this);
+	    var al = slf.find('a').eq(0);
+	    if(al.attr('href')){
+		    var sm = {url:urla(al.attr('href')),name:al.text()};
+		    
+			data.sections.push(sm);
+		}    
+    });
+    
+    return JSON.stringify(data);
+}
+
+function section_parseUrl(url,html){
+	var $ = cheerio.load(html);
+	var urls = '';
+	
+	var jList = $('.sl-page option');
+	var len = jList.length / 2;
+	
+	jList.each(function(idx){
+		if(idx < len) {
+			urls+=$(this).attr('value')+';';
+		}
+	});
+	
+	if(urls.length>0){
+		urls = urls.substr(0,urls.length-1);
+	}
+	
+	return urls;
+}
+
+function section_parse(url,html) {
+	var $ = cheerio.load(html);
+	
+    var list = [];
+
+	var u1 = $('div.pic_box img').attr('src');
+	if(u1){
+		list.push(u1);
+	}
+    
+    return JSON.stringify(list);
+}
+
+
+    ]]>
+		</code>
+    </jscript>
+</site>

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<site ver="3" debug="1" engine="12">
+	<ua></ua>
+	<title>久爱漫画</title>
+	<intro>久爱漫画网为喜爱漫画的漫友推荐最好看的漫画，经典日本漫画大全，还有热门国漫资源，收录腾讯漫画、有妖气、动漫之家等漫画资源，为广大热爱漫画网站的漫友打造第一在线漫画网站.</intro>
+	<author>Touko</author>
+	<key>http://m.92mh.cc</key>
+	<url>http://m.92mh.cc</url>
+	<expr>\.92mh\.cc</expr>
+	<logo> </logo>
+	<encode>utf-8</encode>
+    
+	<main dtype="1">
+		<home>
+			<hots  cache="0" title="热门" method="get"  parse="hots_parse" url="http://www.92mh.cc" 
+				ua="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36" >
+				<tags parse="tags_parse"/>
+			</hots>
+			<tags  title="分类" />
+		</home>
+
+		<tag  cache="0"  method="get" parse="tag_parse" 
+			  ua="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"
+			  header="Accept=application/json;X-Requested-With=XMLHttpRequest"/>
+
+		<book  cache="1d" method="get" buildUrl="book_buildUrl" parse="book_parse"  expr="\/manhua\/">
+			<sections parse="sections_parse" buildUrl="sections_buildUrl" />
+		</book>
+		<section cache="1" method="get"  parse="section_parse" header="cookie;referer"/>
+
+	</main>
+
+	<jscript>
+		<require>
+			<item url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio" />
+		</require>
+		<code>
+			<![CDATA[
+function urla(u) {
+	var host = "http://www.92mh.cc";
+	if (u.indexOf("http")<0) {
+		if (u.substr(0, 1) != '/')
+			u = host + '/' + u;
+		else
+			u = host + u;
+	}
+	return encodeURI(u);
+}
+
+function hots_parse(url, html){
+	var $ = cheerio.load(html);
+	
+	var list = [];
+
+	$('.comicList li').each(function(){
+		var item = $(this);
+		var img = item.find('img');
+
+		var bm = {};
+		bm.name = img.attr('alt');
+		bm.url  = img.parent().attr('href');
+		bm.logo = img.attr('src');
+
+		list.push(bm);
+	});
+	
+	return JSON.stringify(list);
+}
+
+function tags_parse(url, html) {
+	var $ = cheerio.load(html);
+	
+	var list = [];
+
+	$('.nav_type dl').each(function(){
+		var group = $(this);
+		
+		group.find('a').each(function(idx){
+			var item = $(this);
+			var bm = {};
+
+			bm.title = item.text();
+			bm.url  = urla(item.attr('href'))+'index_@page.html';
+			if(idx==0){
+				bm.group = group.find('strong').text();
+			}
+
+			list.push(bm);
+		});
+	});
+	
+	return JSON.stringify(list);
+}
+
+function tag_parse(url, html) {
+    var $ = cheerio.load(html);
+	var list = [];
+	
+	$('.cartoonlist li').each(function(){
+		var img = $(this).find('img');
+		
+		var bm = {};
+		bm.name = img.parent().attr('title');
+		bm.url = urla(img.parent().attr('href'));
+		bm.logo = urla(img.attr('src'));
+		
+		bm.author = '';
+		bm.newSection = $(this).find('.note').text();
+		bm.updateTime = '';
+		bm.status = '';
+		list.push(bm);
+	});
+
+	return JSON.stringify(list);
+}
+
+function book_buildUrl(url){
+	return url.replace('//www.','//m.');
+}
+
+function book_parse(url, html){
+
+	var $ = cheerio.load(html);
+
+	var data = {};
+
+	data.name = $('.header h1').eq(0).text();
+	data.author = $('.fl dd').eq(0).text();
+	data.logo = $('div.img img').attr('src');
+	data.updateTime = $('.fl dd').last().text();
+	data.intro = $('.comic-summary p').text();
+	data.sections = [];
+
+	return JSON.stringify(data);
+}
+
+function sections_buildUrl(url){
+	return 'http://m.92mh.cc/chapterlist/'+url.match(/(\d+)\/$/i)[1];
+}
+
+function sections_parse(url, html){
+	var $ = cheerio.load(html);
+	
+	var data = {};
+	data.sections = [];
+	
+	$('.comic-chapter-list li').each(function(i){
+		var al = $(this).children('a').eq(0);
+		data.sections.push({url:urla(al.attr('href')),name:al.text()});
+	});
+	
+	return JSON.stringify(data);
+}
+
+
+function section_parse(url, html){
+	var jsCode = html.match(/(eval.*?)\s*<\//i)[1];
+	eval(jsCode);
+	
+	var jList = mh_info.images;
+	
+	var list = [];
+	for(var i=0,len=jList.length; i<len; i++){
+		var u1 = jList[i];
+
+        list.push('http://s3.fast.zh868.com'+u1);
+    }
+
+    return JSON.stringify(list);
+}
+
+    ]]>
+		</code>
+	</jscript>
+</site>

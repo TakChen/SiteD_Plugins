@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<site ver="2" debug="1" engine="11" sds="http://sited.noear.org/api.3/">
+	<ua></ua>
+	<title>新动漫网</title>
+	<intro>...</intro>
+	<author>seiya</author>
+	<url>http://www.xindm.cn</url>
+	<expr>\.xindm\.cn</expr>
+	<logo></logo>
+	<encode>GB18030</encode>
+	<main dtype="1">
+		<reward title="反馈" mail="seiya@noear.org">
+			<item txt="如果有问题，请用邮件反馈：" />
+			<item />
+			<item txt="seiya@noear.org"/>
+		</reward>
+		
+		<home>
+			<hots   cache="1d" title="热门" method="get"  parse="hots_parse" url="http://www.xindm.cn">
+				<updates parse="updates_parse"/>
+			</hots>
+			<updates title="更新"  />
+			<tags  title="分类">
+				<item group="题材" title="爱情漫画" url="http://www.xindm.cn/s/shaonvaiqing/index_@page.html"/>
+				<item title="热血漫画" url="http://www.xindm.cn/s/shaonianrexue/index_@page.html"/>
+				<item title="冒险漫画" url="http://www.xindm.cn/s/maoxianmanhua/index_@page.html"/>
+				<item title="校园漫画" url="http://www.xindm.cn/s/xiaoyuanmanhua/index_@page.html"/>
+				<item title="魔法漫画" url="http://www.xindm.cn/s/mofamanhua/index_@page.html"/>
+				<item title="东方神鬼" url="http://www.xindm.cn/s/dongfangshengui/index_@page.html"/>
+				<item title="武侠格斗" url="http://www.xindm.cn/s/wuxiagedou/index_@page.html"/>
+				<item title="科幻机战" url="http://www.xindm.cn/s/kehuanjizhan/index_@page.html"/>
+				<item title="搞笑漫画" url="http://www.xindm.cn/s/baoxiaoxiju/index_@page.html"/>
+				<item title="侦探悬疑" url="http://www.xindm.cn/s/zhentantuili/index_@page.html"/>
+				<item title="恐怖惊悚" url="http://www.xindm.cn/s/kongbujingsong/index_@page.html"/>
+				<item title="竞技体育" url="http://www.xindm.cn/s/jingjitiyu/index_@page.html"/>
+				<item title="后宫漫画" url="http://www.xindm.cn/s/hougongmanhua/index_@page.html"/>
+				<item title="音乐舞蹈" url="http://www.xindm.cn/s/yinlewudao/index_@page.html"/>
+				<item title="励志职场" url="http://www.xindm.cn/s/lizhizhichang/index_@page.html"/>
+				<item title="战争历史" url="http://www.xindm.cn/s/zhanzhenglishi/index_@page.html"/>
+				<item title="萌系漫画" url="http://www.xindm.cn/s/mengximanhua/index_@page.html"/>
+				<item title="四格漫画" url="http://www.xindm.cn/s/sigemanhua/index_@page.html"/>
+				<item title="生活亲情" url="http://www.xindm.cn/s/shenghuoqinqing/index_@page.html"/>
+				<item title="治愈漫画" url="http://www.xindm.cn/s/zhiyumanhua/index_@page.html"/>
+				<item title="耽美百合" url="http://www.xindm.cn/s/danmeibaihe/index_@page.html"/>
+				<item title="伪娘漫画" url="http://www.xindm.cn/s/weiniangmanhua/index_@page.html"/>
+			</tags>
+		</home>
+		<tag  cache="0" addPage="1" method="get"  parse="tags_parse" />
+		<book  cache="1d" method="get"  parse="book_parse"  expr="\/colist_\d+" buildWeb="book_web" />
+		<section cache="1" method="get" encode="utf-8" pop1="false" header="cookie;referer"  parse="section_parse"/>
+	</main>
+	<jscript>
+		<code>
+			<![CDATA[
+
+
+function bookUrl(url){
+	if(url.indexOf("http")>=0)
+		return url;
+	else
+		return "http://www.xindm.cn" + url;
+}
+
+function hots_parse(url,html) {
+	var list = [];
+    var reg  = /(\/mh\/[^\"]*)..target=_blank><img.border=\d+.alt=.([^\"]*)..src=.([^\"]*)/gi;
+
+	var rst;
+	while((rst = reg.exec(html))!=null){
+		var bm = {};
+		bm.name= rst[2];
+		bm.url = bookUrl(rst[1]);
+		bm.logo = bookUrl(rst[3]);
+
+		list.push(bm);
+	}
+    return JSON.stringify(list);
+}
+
+function updates_parse(url,html) {
+    var list = [];
+    var reg  = /<li><div><a.href=.([^\"]*).([^>]*>){6}([^<]*)<\/a>([^>]*>){3}([^<]*)([^>]*>){5}([^<]*)/gi;
+
+	var rst;
+	while((rst = reg.exec(html))!=null){
+		var bm = {};
+		bm.name= rst[3];
+		bm.url = bookUrl(rst[1]);
+		bm.updateTime = rst[7];
+		bm.newSection = rst[5];
+
+		list.push(bm);
+	}
+    return JSON.stringify(list);
+}
+
+function tags_parse(url,html) {
+	var list = [];
+	var reg = /<div[^>]*>\s*<div[^>]*>\s*<a.href=.([^\"]*).[^>]*><img.src=.([^\"]*).([^>]*>){5}([^<]*)([^>]*>){5}([^<]*)([^>]*>){4}([^<]*)/gi;
+
+	var rst;
+	while((rst = reg.exec(html))!=null){
+		var bm = {};
+		bm.name = rst[4];
+		bm.url = bookUrl(rst[1]);
+		bm.logo = bookUrl(rst[2]).trim();
+		bm.newSection = rst[6];
+		bm.updateTime = rst[8];
+		bm.status = "";
+
+		list.push(bm);
+	}
+	return JSON.stringify(list);
+}
+
+function book_parse(url, html) {
+    var data = {};
+
+    data.name = html.match(/<h1>([^<]*)<\/h1>/i)[1];
+    data.author = html.match(/作者：\s*<a[^>]*>([^<]*)/i)[1];
+    data.logo = bookUrl(html.match(/<img.src=.([^\"]*)..border[^>]*>/i)[1]);
+    data.updateTime = "";
+
+    data.intro = html.match(/<p.class=.Grays_01.desc_f.>(<p>)?([^<]*)/i)[2];
+
+    data.sections = [];
+
+    var reg = /<li>\s*<a.href=.([^\"]*).[^>]*>\s*<span.class=.black.>\s*(<b>)?([^<]*)/gi;
+    var rst;
+    while ((rst = reg.exec(html)) != null) {
+        var sec_url = "http://m.xindm.cn/Index/info/id/" + rst[1].match(/\d+.html/i);
+        var sm = { url: sec_url, name: rst[3] };
+
+        data.sections.push(sm);
+    }
+
+    return JSON.stringify(data);
+}
+
+
+function book_web(url) {
+	var temp = url.match(/\d+/i);
+	if(temp && temp.length>0)
+		return "http://m.xindm.cn/Index/listu/id/" + url.match(/\d+/i) + ".html";
+	else
+		return bookUrl(url);
+}
+
+function book_key(url) {
+	return url;
+}
+
+function section_parse(url, html) {
+    var list = [];
+
+    var sList = html.match(/images:\s*(\[[^\]]*])/i)[1];
+    var reg = /'([^']+)'/gi;
+
+	var rst;
+	while((rst = reg.exec(html))!=null){
+        list.push(rst[1]);
+    }
+
+    return JSON.stringify(list);
+}
+
+function section_key(url) {
+	return url;
+}
+
+    ]]>
+		</code>
+	</jscript>
+</site>

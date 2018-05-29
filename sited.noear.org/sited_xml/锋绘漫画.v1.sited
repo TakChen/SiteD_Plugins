@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<site ver="1" debug="0" engine="12">
+  <ua></ua>
+  <title>锋绘漫画</title>
+  <intro>国内领先的专业原创漫画网站，汇聚众多国漫原创漫画，云集大批原创漫画作者。</intro>
+  <author>zxt</author>
+  <key>http://www.ifenghui.com</key>
+  <url>http://www.ifenghui.com</url>
+  <expr>\.ifenghui\.com</expr>
+  <logo></logo>
+  <encode>utf-8</encode>
+  <main dtype="1">
+    <home>
+      <hots cache="1d" title="推荐" method="get" w="3" h="4" parse="hots_parse" url="http://www.ifenghui.com/index.html"></hots>
+      <updates cache="1d" title="更新" method="get" parse="updates_parse" url="http://www.ifenghui.com/manhua_new.html"></updates>
+      <tags title="分类">
+        <item title="爱情" url="http://www.ifenghui.com/manhua_list/1-0-0-0-0-0-0-@@.html?p=@page" />
+        <item title="都市" url="http://www.ifenghui.com/manhua_list/2-0-0-0-0-0-0-@@.html?p=@page" />
+        <item title="恐怖" url="http://www.ifenghui.com/manhua_list/3-0-0-0-0-0-0-@@.html?p=@page" />
+        <item title="悬疑" url="http://www.ifenghui.com/manhua_list/4-0-0-0-0-0-0-@@.html?p=@page" />
+        <item title="科幻" url="http://www.ifenghui.com/manhua_list/5-0-0-0-0-0-0-@@.html?p=@page" />
+        <item title="魔幻" url="http://www.ifenghui.com/manhua_list/6-0-0-0-0-0-0-@@.html?p=@page" />
+        <item title="玄幻" url="http://www.ifenghui.com/manhua_list/7-0-0-0-0-0-0-@@.html?p=@page" />
+        <item title="历史" url="http://www.ifenghui.com/manhua_list/8-0-0-0-0-0-0-@@.html?p=@page" />
+        <item title="游戏" url="http://www.ifenghui.com/manhua_list/9-0-0-0-0-0-0-@@.html?p=@page" />
+        <item title="三俗" url="http://www.ifenghui.com/manhua_list/10-0-0-0-0-0-0-@@.html?p=@page" />
+        <item title="生活" url="http://www.ifenghui.com/manhua_list/11-0-0-0-0-0-0-@@.html?p=@page" />
+        <item title="话题" url="http://www.ifenghui.com/manhua_list/12-0-0-0-0-0-0-@@.html?p=@page" />
+        <item title="萌系" url="http://www.ifenghui.com/manhua_list/13-0-0-0-0-0-0-@@.html?p=@page" />
+        <item title="治愈" url="http://www.ifenghui.com/manhua_list/14-0-0-0-0-0-0-@@.html?p=@page" />
+        <item title="机甲" url="http://www.ifenghui.com/manhua_list/15-0-0-0-0-0-0-@@.html?p=@page" />
+      </tags>
+    </home>
+    <search cache="1d" method="get"  parse="search_parse" url="http://www.ifenghui.com/search_comic/@key/0-0.html" />
+    <tag cache="1d" method="get" parse="tag_parse" buildUrl="tag_buildUrl"/>
+    <book cache="1d" method="get" parse="book_parse" expr="index-comic-name" header="cookie|referer"></book>
+    <section cache="1" method="get" parseUrl="section_parseUrl" parse="section_parse" header="cookie|referer" addCookie="readmode=0" />
+  </main>
+  <jscript>
+    <require>
+      <item encode="utf-8" url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio" />
+    </require>
+    <code>
+      <![CDATA[
+function urla(u) {
+  var host = "http://www.ifenghui.com";
+
+  if (u.substr(0, 4) != "http") {
+      if (u.substr(0, 1) != '/')
+          u = host + '/' + u;
+      else
+          u = host + u;
+  }
+
+  return encodeURI(u);
+}
+
+function trimString(data) {
+  return data.replace(/\\t/g, '').replace(/\\n/g, '').replace(/\\r/g, '').replace(/\\r\\n/g, '').trim();
+}
+
+function hots_parse(url, html) {
+  var $ = cheerio.load(html);
+  var list = [];
+
+  var i = 0;
+
+  $('.edit.mt8').each(function () {
+      if (i > 1)
+          return false;
+
+      $(this).children('.edit-art').each(function () {
+          $(this).children('dl').each(function () {
+              var bm = {};
+              bm.name = trimString($(this).find('.index-post').text());
+              bm.url = urla($(this).find('.index-post').attr('href'));
+              bm.logo = $(this).find('img').attr('data-original');
+
+              list.push(bm);
+          });
+      });
+
+      i++;
+  });
+
+  return JSON.stringify(list);
+}
+
+function updates_parse(url, html) {
+  var $ = cheerio.load(html);
+  var list = [];
+
+  $('.edit.mt8').each(function () {
+      $(this).children('.edit-art').each(function () {
+          $(this).children('dl').each(function () {
+              var bm = {};
+              bm.name = trimString($(this).find('.index-post').text());
+              bm.url = urla($(this).find('.index-post').attr('href'));
+              bm.logo = $(this).find('img').attr('src');
+
+              bm.author = '';
+              bm.newSection = trimString($(this).children('dd').children('a').text());
+              bm.updateTime = '';
+              bm.status = '';
+              list.push(bm);
+          });
+      });
+  });
+
+  return JSON.stringify(list);
+}
+
+function tag_parse(url, html) {
+  var $ = cheerio.load(html);
+  var list = [];
+
+  $('.quan-list dl').each(function () {
+      var bm = {};
+      bm.name = $(this).find('img').attr('title');
+      bm.url = urla($(this).find('.click').attr('href'));
+      bm.logo = $(this).find('img').attr('data-original');
+
+      bm.author = '';
+      bm.newSection = $(this).find('p').text();
+      bm.updateTime = '';
+      bm.status = '';
+      list.push(bm);
+  });
+
+  return JSON.stringify(list);
+}
+
+function tag_buildUrl(url, page) {
+  var start = (page - 1) * 24;
+  return url.replace('@@', start);
+}
+
+function search_parse(url, html) {
+  var $ = cheerio.load(html);
+  var list = [];
+
+  $('.quan-list dl').each(function () {
+      var bm = {};
+      bm.name = $(this).find('img').attr('title');
+      bm.url = urla($(this).find('a').attr('href'));
+      bm.logo = $(this).find('img').attr('src');
+
+      bm.author = $($(this).find('p')[1]).text().replace('作者：', '');
+      bm.newSection = $($(this).find('p')[0]).text();
+      bm.updateTime = '';
+      bm.status = '';
+      list.push(bm);
+  });
+
+  return JSON.stringify(list);
+}
+
+function book_parse(url, html) {
+  var $ = cheerio.load(html);
+  var data = {};
+
+  data.name = $('.works-yue').find('img').attr('title');
+  data.author = $('.author').text();
+  data.logo = $('.works-yue').find('img').attr('src')
+  data.updateTime = $('.works-yue').text().match(/更新：([\d]{1,2}[\d]{1,2}-[\d]{1,2})/g)[1];
+  data.intro = trimString($('.zkgd-hide').text().replace('简介：', ''));
+
+  data.sections = [];
+
+  $('.tab_content ul').each(function () {
+      $(this).children('li').each(function () {
+          var s = {
+              name: $(this).children('a').text(),
+              url: urla($(this).children('a').attr('href'))
+          };
+
+          data.sections.splice(0, 0, s);
+      });
+  });
+
+  return JSON.stringify(data);
+}
+
+function section_parseUrl(url, html) {
+  var urls = url;
+  var temp = html.match(/comic_total\s*=\s*(\d+)/i)[1];
+  var num = eval(temp);
+
+  for (var i = 2; i <= num; i++) {
+      urls += (";" + url + "&page=" + i);
+  }
+
+  return urls;
+}
+
+function section_parse(url, html) {
+  var temp = html.match(/imgtree\s*=\s*(\[[^\]]*\])/i)[1];
+  var imgList = eval(temp);
+
+  var list = [];
+  if (imgList) {
+      for (var i = 0, len = imgList.length; i < len; i++) {
+          list.push(imgList[i].img);
+      }
+  }
+
+  return JSON.stringify(list);
+}
+      ]]>
+    </code>
+  </jscript>
+</site>

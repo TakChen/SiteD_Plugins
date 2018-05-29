@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<site ver="1" debug="1" engine="17" private="1" sds="http://sited.noear.org/api.3/">
+    <ua></ua>
+    <title>又一个妹子图</title>
+    <intro>和妹子图的服务器不同,更新略慢，不支持搜索</intro>
+    <author>XoX</author>
+    <url>http://m.meizitu.com</url>
+    <feeback>523070226@qq.com</feeback>
+    <expr>\.meizitu\.com</expr>
+    <logo></logo>
+    <encode>GB2312</encode>
+	<main dtype="4" durl="http://m.meizitu.com">
+	<reward title='打我' mail='523070226@qq.com'>
+	  <item txt='开发者@XoX的账号' />
+	  <item />
+	  <item title='支付宝' url='18100177484' />
+	  <item />
+	  <item txt='感谢你对开发者的支持' />
+	  </reward>
+		<home>
+			<hots  cache="1d"  title="首页"  method="get"  parse="hots_parse" url="http://m.meizitu.com"/>
+			<tags  title="频道">
+				<item group="妹子分类" title="性感" url="http://m.meizitu.com/a/xinggan_2_@page.html" />
+				<item title="清纯" url="http://m.meizitu.com/a/qingchun_3_@page.html" />
+				<item title="萌妹子" url="http://m.meizitu.com/a/meizi_4_@page.html" />
+				<item title="私房" url="http://m.meizitu.com/a/sifang_5_@page.html" />
+				<item title="小清新" url="http://m.meizitu.com/a/xiaoqingxin_6_@page.html" />
+				<item title="女神" url="http://m.meizitu.com/a/nvshen_7_@page.html" />
+				<item title="气质" url="http://m.meizitu.com/a/qizhi_8_@page.html" />
+				<item title="模特" url="http://m.meizitu.com/a/mote_9_@page.html" />
+				<item title="比基尼" url="http://m.meizitu.com/a/bijini_10_@page.html" />
+				<item title="宝贝" url="http://m.meizitu.com/a/baobei_11_@page.html" />
+				<item title="萝莉" url="http://m.meizitu.com/a/luoli_12_@page.html" />
+				<item title="网络" url="http://m.meizitu.com/a/wangluo_13_@page.html" />
+				<item title="日韩美女" url="http://m.meizitu.com/a/rihan_14_@page.html" />
+				<item title="欧美美女" url="http://m.meizitu.com/a/oumei_15_@page.html" />
+
+				<item group="极品分类" title="酥胸" url="http://m.meizitu.com/tag/suxiong_17_@page.html" />
+				<item title="少女" url="http://m.meizitu.com/tag/shaonv_404_@page.html" />
+				<item title="私房" url="http://m.meizitu.com/tag/sifang_18_@page.html" />
+				<item title="美腿" url="http://m.meizitu.com/tag/meitui_13_@page.html" />
+				<item title="巨乳" url="http://m.meizitu.com/tag/juru_31_@page.html" />
+				<item title="清纯" url="http://m.meizitu.com/tag/qingchun_32_@page.html" />
+				<item title="可爱" url="http://m.meizitu.com/tag/keai_64_@page.html" />
+				<item title="美臀" url="http://m.meizitu.com/tag/meitun_42_@page.html" />
+				<item title="全裸" url="http://m.meizitu.com/tag/quanluo_4_@page.html" />
+				<item title="女神" url="http://m.meizitu.com/tag/nvshen_460_@page.html" />
+				<item title="成熟" url="http://m.meizitu.com/tag/chengshu_487_@page.html" />
+				<item title="气质" url="http://m.meizitu.com/tag/qizhi_53_@page.html" />
+				<item title="半裸" url="http://m.meizitu.com/tag/banluo_5_@page.html" />
+			</tags>
+		</home>
+		<tag  cache="1d"  method="get"  parse="tag_parse" />
+		<book  cache="1d"  method="get" parse="book_parse" expr="\/\d+" />
+    </main>
+    <jscript>
+	    <require>
+			<item url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio" />
+		</require>
+		<code>
+        <![CDATA[
+
+function htmlEsc(obj) {
+	var arrEntities = {
+		'lt': '<',
+		'gt': '>',
+		'nbsp': ' ',
+		'amp': '&',
+		'quot': '"'
+	};
+	for(var i in obj){
+		var str = obj[i];
+		if(typeof(str) == 'object')
+			str = htmlEsc(str);
+		if(typeof(str) != 'string')
+			continue;
+		obj[i] = str.replace(/<[^<>]+?>/g, '').replace(/&(lt|gt|nbsp|amp|quot);/ig, function(all, t) {
+		return arrEntities[t];
+		}).trim();
+	}
+	return obj;
+}
+
+function tag_parse(url, html) {
+    var $ = cheerio.load(html);
+	var list = [];
+	
+$("div.am-gallery-item").find('img').each(function(){
+	var bm = {};
+	bm.name = $(this).siblings('h3').text().trim();
+	bm.url  = $(this).parent().attr("href");
+	bm.logo = $(this).attr('data-original');
+       
+	list.push(bm);
+});
+	
+	return JSON.stringify(list);
+}
+
+function hots_parse(url, html) {
+    var $ = cheerio.load(html);
+	var list = [];
+	
+$("div.am-gallery-item").find('img').each(function(){
+	var bm = {};
+	bm.name = $(this).siblings('h3').text().trim();
+	bm.url  = $(this).parent().attr("href");
+	bm.logo = $(this).attr('data-original');
+       
+	list.push(bm);
+});
+return JSON.stringify(list);
+}
+
+function book_parse(url,html){
+	var $ = cheerio.load(html);
+
+	var data = {};
+	
+	data.name = 	$(".metaRight h2").text().trim();
+	data.sections = [];
+
+	$("div#picture").find('img').each(function(){
+        var bm = {
+			name: '',
+			url: $(this).attr('src')
+		};
+        data.sections.push(bm);
+   });
+
+    return JSON.stringify(data);
+}
+
+    ]]>
+		</code>
+    </jscript>
+</site>

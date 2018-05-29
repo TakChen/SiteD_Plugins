@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<site ver="2" debug="1" engine="14">
+	<ua></ua>
+	<title>极速漫画</title>
+	<intro>极速漫画网，感觉目录全，东西少。有的漫画由于版权原因下架了。</intro>
+	<author>wjm2038</author>
+	<url>http://www.1kkk.com</url>
+	<expr>\.1kkk\.com</expr>
+	<logo></logo>
+	<encode>utf-8</encode>
+	<main dtype="1" >
+		<home>
+			<hots cache="60m" title="更新" method="get" parse="hots_parse" url="http://www.1kkk.com/manhua-new/" />
+			<tags   title="分类">
+				<item group="完结状态" title="全部" url="http://www.1kkk.com/manhua-new-p@page/" />
+				<item title="连载中" url="http://www.1kkk.com/manhua-list-st1-p@page/" />
+				<item title="已完结" url="http://www.1kkk.com/manhua-list-st2-p@page/" />
+				
+				<item group="漫画分类" title="全部" url="http://www.1kkk.com/manhua-list-p@page/" />
+				<item title="少年热血" url="http://www.1kkk.com/manhua-shaonianrexue-p@page/" />
+				<item title="少女爱情" url="http://www.1kkk.com/manhua-shaonvaiqing-p@page/" />
+				<item title="武侠格斗" url="http://www.1kkk.com/manhua-wuxiagedou-p@page/" />
+				<item title="科幻魔幻" url="http://www.1kkk.com/manhua-kehuanmohuan-p@page/" />
+				<item title="竞技体育" url="http://www.1kkk.com/manhua-jingjitiyu-p@page/" />
+				<item title="爆笑喜剧" url="http://www.1kkk.com/manhua-baoxiaoxiju-p@page/" />
+				<item title="侦探推理" url="http://www.1kkk.com/manhua-zhentantuili-p@page/" />
+				<item title="其他漫画" url="http://www.1kkk.com/manhua-qitamanhua-p@page/" />
+				<item title="东方同人" url="http://www.1kkk.com/manhua-dongfangtongren-p@page/" />
+				
+				<item group="地区分类" title="全部" url="http://www.1kkk.com/manhua-list-p@page/" />
+				<item  title="港台" url="http://www.1kkk.com/manhua-hktw-p@page/" />
+				<item  title="日韩" url="http://www.1kkk.com/manhua-jpkr-p@page/" />
+				<item  title="大陆" url="http://www.1kkk.com/manhua-china-p@page/" />
+				<item  title="欧美" url="http://www.1kkk.com/manhua-euus-p@page/" />
+				
+				<item group="字母分类" title="ALL" url="http://www.1kkk.com/manhua-list-p@page/" />
+				<item title="A" url="http://www.1kkk.com/manhua-a-p@page/" />
+				<item title="B" url="http://www.1kkk.com/manhua-b-p@page/" />
+				<item title="C" url="http://www.1kkk.com/manhua-c-p@page/" />
+				<item title="D" url="http://www.1kkk.com/manhua-d-p@page/" />
+				<item title="E" url="http://www.1kkk.com/manhua-e-p@page/" />
+				<item title="F" url="http://www.1kkk.com/manhua-f-p@page/" />
+				<item title="G" url="http://www.1kkk.com/manhua-g-p@page/" />
+				<item title="H" url="http://www.1kkk.com/manhua-h-p@page/" />
+				<item title="I" url="http://www.1kkk.com/manhua-i-p@page/" />
+				<item title="J" url="http://www.1kkk.com/manhua-j-p@page/" />
+				<item title="K" url="http://www.1kkk.com/manhua-k-p@page/" />
+				<item title="L" url="http://www.1kkk.com/manhua-l-p@page/" />
+				<item title="M" url="http://www.1kkk.com/manhua-m-p@page/" />
+				<item title="N" url="http://www.1kkk.com/manhua-n-p@page/" />
+				<item title="O" url="http://www.1kkk.com/manhua-o-p@page/" />
+				<item title="P" url="http://www.1kkk.com/manhua-p-p@page/" />
+				<item title="Q" url="http://www.1kkk.com/manhua-q-p@page/" />
+				<item title="R" url="http://www.1kkk.com/manhua-r-p@page/" />
+				<item title="S" url="http://www.1kkk.com/manhua-s-p@page/" />
+				<item title="T" url="http://www.1kkk.com/manhua-t-p@page/" />
+				<item title="U" url="http://www.1kkk.com/manhua-u-p@page/" />
+				<item title="V" url="http://www.1kkk.com/manhua-v-p@page/" />
+				<item title="W" url="http://www.1kkk.com/manhua-w-p@page/" />
+				<item title="X" url="http://www.1kkk.com/manhua-x-p@page/" />
+				<item title="Y" url="http://www.1kkk.com/manhua-y-p@page/" />
+				<item title="Z" url="http://www.1kkk.com/manhua-z-p@page/" />
+				<item title="0-9" url="http://www.1kkk.com/manhua-0-9-p@page/" />
+			</tags>
+		</home>
+		<search cache="1d" method="get" parse="search_parse" url="http://www.1kkk.com/search?title=@key" />
+		<tag cache="0" addPage="1" method="get" parse="tags_parse" />
+		<book cache="1d" method="get" parse="book_parse" expr="\/manhua" />
+		<section cache="1" method="get" parse="section_parse" 
+			parseUrl="section_parseUrl" 
+			header="cookie;referer;Accept=*/*;X-Requested-With=XMLHttpRequest"  />
+		<object header="cookie;referer" />
+	</main>
+	<jscript>
+		<require>
+			<item url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio" />
+		</require>
+		<code>
+		<![CDATA[
+function urla(url){
+	if(url.indexOf("http")>=0)
+		return url;
+	else
+		return "http://www.1kkk.com" + url;
+}
+
+function htmlEsc(obj) {
+	var arrEntities = {
+		'lt': '<',
+		'gt': '>',
+		'nbsp': ' ',
+		'amp': '&',
+		'quot': '"'
+	};
+	for(var i in obj){
+		var str = obj[i];
+		if(typeof(str) == 'object')
+			str = htmlEsc(str);
+		if(typeof(str) != 'string')
+			continue;
+		obj[i] = str.replace(/<[^<>]+?>/g, '').replace(/&(lt|gt|nbsp|amp|quot);/ig, function(all, t) {
+		return arrEntities[t];
+		}).trim();
+	}
+	return obj;
+}
+
+function hots_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('.cover').each(function(){
+		var img = $(this).find('img');
+		
+		var bm = {};
+		bm.name = img.parent().text().replace(/(^\s*)|(\s*$)/g, "");
+		bm.url = urla(img.parent().attr('href'));
+		bm.logo = urla(img.attr('src'));
+		
+		list.push(bm);
+	});
+
+	return JSON.stringify(htmlEsc(list));
+}
+
+function search_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('.cover').each(function(){
+		var bm = {};
+		bm.name = $('.in_02 .k488').find('.a_comicname').text();
+		bm.url = urla($('.in_02 .k488 a').attr('href'));
+		bm.logo = $('.in_02 .k488 img').attr('src');
+			
+		bm.author = $('.in_02 .k120').find('a').eq(0);
+		bm.newSection = $('.in_02 .k488').find('.lj_hei').eq(0).text().replace(/\s/g,"");
+		bm.updateTime = '';
+		bm.status = '';
+		list.push(bm);
+	});
+
+	return JSON.stringify(htmlEsc(list));
+}
+
+
+function tags_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('.cover').each(function(){
+		var img = $(this).find('img');
+		
+		var bm = {};
+		bm.name = img.parent().text().replace(/(^\s*)|(\s*$)/g, "");
+		bm.url = urla(img.parent().attr('href'));
+		bm.logo = urla(img.attr('src'));
+		
+		list.push(bm);
+	});
+
+	return JSON.stringify(htmlEsc(list));
+}
+
+function book_parse(url, html) {
+	var $ = cheerio.load(html);
+	
+	var data = {};
+	
+	data.name = $(".sy_k21 h1").text().trim();
+	data.author = $(".sy_k22 li:nth-child(3) a").text();
+	data.logo = urla($('.sy_k1 img').attr('src'));
+	data.updateTime = $(".sy_k22 li:nth-child(3) font").text();
+	data.intro = $('.sy_k22 .mt10').text().replace(/([^:]*)：/i,'').trim();
+	
+	
+	data.sections = [];
+
+	$('.sy_nr1 li a').each(function(){
+		var item = $(this);
+		var s = {
+			name: item.text(),
+			url: urla(item.attr('href'))
+		};
+		data.sections.push(s);
+	});
+	
+	return JSON.stringify(htmlEsc(data));
+}
+
+function section_parseUrl(url, html) {
+	var $ = cheerio.load(html);
+	var cid = url.match(/-(\d+)/i)[1];
+
+	var pages = parseInt($('.zf40 span').last().text());
+	var urls='';
+	for(var i=1; i<=pages; i++){
+		if(urls.length>0){
+			urls+=';';
+		}
+		urls += (url+'imagefun.ashx?cid='+cid+'&page='+i+'&key=&maxcount=10');
+	}
+
+	return urls;
+}
+
+function section_parse(url, html) {
+	var jList = eval(html);
+
+	var list = [];
+	jList.forEach(function(item,idx){
+		if(idx==0){
+			list.push(item);
+		}
+	});
+
+	return JSON.stringify(list);
+}
+
+            ]]>
+		</code>
+	</jscript>
+</site>

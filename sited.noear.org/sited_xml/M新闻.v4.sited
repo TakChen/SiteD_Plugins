@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<site ver="4" debug="1" engine="11" sds="http://sited.noear.org/api.3/">
+    <ua></ua>
+    <title>M新闻</title>
+    <intro>[资讯]给您提供最快的动漫新闻资讯,动漫新番情报,讨论气氛浓厚,话题丰富,努力打造最好的动漫新闻平台...</intro>
+    <author>seiya</author>
+    <url>http://news.missevan.com</url>
+    <expr>news\.missevan\.com</expr>
+    <logo></logo>
+    <encode>utf-8</encode>
+	<main dtype="6">
+		<reward title="反馈" mail="seiya@noear.org">
+			<item txt="如果有问题，请用邮件反馈：" />
+			<item />
+			<item txt="seiya@noear.org"/>
+		</reward>
+		
+		<home>
+			<updates title="首页" method="get" showImg="1" parse="updates_parse" url="http://news.missevan.com/news/index?ntype=1" />
+			<tags  title="频道" method="get">
+				<item title="动画" url="http://news.missevan.com/news/index?ntype=2" />
+				<item title="音乐" url="http://news.missevan.com/news/index?ntype=3" />
+				<item title="游戏" url="http://news.missevan.com/news/index?ntype=4" />
+				<item title="声优" url="http://news.missevan.com/news/index?ntype=5" />
+				<item title="小说" url="http://news.missevan.com/news/index?ntype=6" />
+				<item title="漫画" url="http://news.missevan.com/news/index?ntype=7" />
+				<item title="Cosplay" url="http://news.missevan.com/news/index?ntype=8" />
+				<item title="杂志" url="http://news.missevan.com/news/index?ntype=9" />
+				<item title="周边" url="http://news.missevan.com/news/index?ntype=10" />
+				<item title="展会" url="http://news.missevan.com/news/index?ntype=11" />
+				<item title="电影" url="http://news.missevan.com/news/index?ntype=12" />
+				<item title="萌宅" url="http://news.missevan.com/news/index?ntype=13" />
+				<item title="杂谈" url="http://news.missevan.com/news/index?ntype=14" />
+				<item title="DED/BD" url="http://news.missevan.com/news/index?ntype=15" />
+				<item title="Other" url="http://news.missevan.com/news/index?ntype=16" />
+			</tags>
+		</home>
+		<tag  cache="1d"  method="get"  parse="tag_parse" />
+		<book  cache="1d" method="get"  parse="book_parse" expr="\/article\/" />
+    </main>
+    <jscript>
+	    <require>
+			<item url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio" />
+		</require>
+		<code>
+        <![CDATA[
+
+function urla(u) {
+	var host = "http://news.missevan.com";
+	if (u.indexOf("http")<0) {
+		if (u.substr(0, 1) != '/')
+			u = host + '/' + u;
+		else
+			u = host + u;
+	}
+	return encodeURI(u);
+}
+
+function htmlEsc(obj) {
+	var arrEntities = {
+		'lt': '<',
+		'gt': '>',
+		'nbsp': ' ',
+		'amp': '&',
+		'quot': '"'
+	};
+	for(var i in obj){
+		var str = obj[i];
+		if(typeof(str) == 'object')
+			str = htmlEsc(str);
+		if(typeof(str) != 'string')
+			continue;
+		obj[i] = str.replace(/<[^<>]+?>/g, '').replace(/&(lt|gt|nbsp|amp|quot);/ig, function(all, t) {
+		return arrEntities[t];
+		}).trim();
+	}
+	return obj;
+}
+
+function updates_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('#left > div.newslist').each(function(){
+		var item = $(this);
+		
+		var bm = {};
+		bm.name = item.find('a').eq(0).text().trim();
+		bm.url  = urla(item.find('a').eq(0).attr('href'));
+		bm.logo = item.find('img').attr('data-original');
+		bm.newSection = '';
+		bm.updateTime = item.find('.newsinfo2').eq(1).text();
+
+		list.push(bm);
+	});
+
+	return JSON.stringify(list);
+}
+
+function tag_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('#left > div.newslist').each(function(){
+		var item = $(this);
+		
+		var bm = {};
+		bm.name = item.find('a').eq(0).text().trim();
+		bm.url  = urla(item.find('a').eq(0).attr('href'));
+		bm.logo = item.find('img').eq(0).attr('data-original');
+		bm.newSection = '';
+		bm.updateTime = item.find('.newsinfo2').eq(1).text();
+
+		list.push(bm);
+	});
+
+	
+	return JSON.stringify(htmlEsc(list));
+}
+
+function book_parse(url,html) {
+	var $ = cheerio.load(html);
+	
+	var list = [];
+	
+	$('#articlecontent p').each(function(){
+		var item = $(this);
+		var txt = item.text().trim();
+		
+		if(txt.length>0){
+			list.push({d:txt,t:1});
+		}
+		
+		item.children('img').each(function(){
+			var img = $(this);
+			list.push({d:img.attr('src'),t:9});
+		});
+		
+		item.find('img').each(function(){
+			var img = $(this);
+			list.push({d:img.attr('src'),t:9});
+		});
+	});
+	
+	
+	return JSON.stringify(list);
+}
+
+    ]]>
+		</code>
+    </jscript>
+</site>

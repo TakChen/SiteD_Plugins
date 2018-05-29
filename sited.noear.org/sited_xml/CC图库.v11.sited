@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<site ver="11" debug="1" engine="12" sds="http://sited.noear.org/api.3/">
+    <ua></ua>
+    <title>CC图库</title>
+    <intro>港漫它是最棒的,老牌子了！不过阅读页加载很慢...</intro>
+    <author>seiya</author>
+    <url>http://www.tuku.cc</url>
+    <expr>\.tuku\.cc</expr>
+    <logo></logo>
+    <encode>utf-8</encode>
+	<main dtype="1">
+		<reward title="反馈" mail="seiya@noear.org">
+			<item txt="如果有问题，请用邮件反馈：" />
+			<item />
+			<item txt="seiya@noear.org"/>
+		</reward>
+		
+		<home>
+	        <hots   cache="1d" title="热门" method="get"  parse="hots_parse" url="http://www.tuku.cc">
+				<updates parse="updates_parse" />
+			</hots>
+	        <updates title="更新" />
+	        <tags  title="分类">
+	            <item group="进度" title="连载中" url="http://www.tuku.cc/lianzai/@page" />
+				<item title="已完结" url="http://www.tuku.cc/wanjie/@page" />
+				
+				<item group="题材" title="魔幻" url="http://www.tuku.cc/list/list_1_@page.htm" />
+				<item title="高清" url="http://www.tuku.cc/list/list_36_@page.htm" />
+				<item title="游戏" url="http://www.tuku.cc/list/list_14_@page.htm" />
+				<item title="武侠" url="http://www.tuku.cc/list/list_15_@page.htm" />
+				<item title="拳皇" url="http://www.tuku.cc/list/list_12_@page.htm" />
+				<item title="街霸" url="http://www.tuku.cc/list/list_13_@page.htm" />
+				<item title="动作" url="http://www.tuku.cc/list/list_2_@page.htm" />
+				<item title="体育" url="http://www.tuku.cc/list/list_3_@page.htm" />
+				<item title="足球" url="http://www.tuku.cc/list/zt_21_@page.htm" />
+				<item title="悬疑" url="http://www.tuku.cc/list/list_10_@page.htm" />
+				<item title="恐怖" url="http://www.tuku.cc/list/list_9_@page.htm" />
+				<item title="少女爱情" url="http://www.tuku.cc/list/list_4_@page.htm" />
+				<item title="搞笑" url="http://www.tuku.cc/list/list_7_@page.htm" />
+				<item title="探险" url="http://www.tuku.cc/list/list_8_@page.htm" />
+				<item title="科幻" url="http://www.tuku.cc/list/list_11_@page.htm" />
+				<item title="历史" url="http://www.tuku.cc/list/list_22_@page.htm" />
+				<item title="校园" url="http://www.tuku.cc/list/list_20_@page.htm" />
+				<item title="厨艺" url="http://www.tuku.cc/list/list_31_@page.htm" />
+				<item title="四格" url="http://www.tuku.cc/list/list_30_@page.htm" />
+				<item title="同人" url="http://www.tuku.cc/list/list_18_@page.htm" />
+				<item title="短篇" url="http://www.tuku.cc/list/list_34_@page.htm" />
+				<item title="萌" url="http://www.tuku.cc/list/list_6_@page.htm" />
+				<item title="美女" url="http://www.tuku.cc/list/list_19_@page.htm" />
+				<item title="PLMM" url="http://www.tuku.cc/list/tag_32_@page.htm" />
+				<item title="江湖" url="http://www.tuku.cc/list/list_32_@page.htm" />
+				<item title="青年" url="http://www.tuku.cc/list/list_17_@page.htm" />
+	        </tags>
+		</home>
+		<search  cache="1d" method="get"  parse="search_parse" url="http://www.tuku.cc/comic/search?w=@key&amp;page=@page" />
+		<tag  cache="0" method="get"  parse="tags_parse" />
+		<book  cache="1d"  method="get" buildUrl="book_buildUrl"  parse="book_parse"  expr="\/comic\/" />
+		<section cache="1" method="get"  parse="section_parse" header="cookie;referer" />
+    </main>
+    <jscript>
+	    <require>
+			<item url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio" />
+		</require>
+		<code>
+        <![CDATA[
+
+function urla(u) {
+	var host = "http://www.tuku.cc";
+	if (u.indexOf("http")<0) {
+		if (u.substr(0, 1) != '/')
+			u = host + '/' + u;
+		else
+			u = host + u;
+	}
+	return encodeURI(u);
+}
+
+function bookUrl(url) {
+	var bid = url.match(/comic\/(\d+)/i)[1];
+
+	return "http://www.tuku.cc/comic/"+bid+"/";
+}
+
+function secUrl(url){
+	if(url.indexOf("http")>=0)
+		return url;
+	else
+		return "http://www.tuku.cc" + url;
+}
+
+function hots_parse(url,html) {
+	var list = [];
+    var reg  = /<div.class=.hotfix.>([^>]*>){2}\s*<a.href=.([^\"]*).(.target=._blank.)?.title=.([^\"]*).[^>]*>\s*<img.src=.([^\"]*)./gi;
+
+	var rst;
+	while((rst = reg.exec(html))!=null){
+		var bm = {};
+		bm.name= rst[4];
+		bm.url = bookUrl(rst[2]);
+		bm.logo = rst[5];
+		list.push(bm);
+	}
+    return JSON.stringify(list);
+}
+
+function updates_parse(url,html) {
+    var list = [];
+
+	var html2 = null;
+	var idx   = html.indexOf("shortlist newly");
+	if(idx>0)
+		html2 = html.substr(idx);
+	else
+		html2 = html;
+
+    var reg  = /<div.class=.ti.><a.href=.([^\"]*).[^>]*>([^<]*)<\/a><\/div>\s*<div.class=.inf.>([^<]*)/gi;
+
+	var rst;
+	while((rst = reg.exec(html2))!=null){
+		var bm = {};
+		bm.name= rst[2];
+		bm.url = bookUrl(rst[1]);
+		bm.updateTime = rst[3];
+		bm.newSection = "";
+		list.push(bm);
+	}
+    return JSON.stringify(list);
+}
+
+function search_parse(url,html) {
+    var list = [];
+	var reg = /<div.class=.lrcol.>\s*<div.class=.l.>\s*<a.href=.([^\"]*)..title=.([^\"]*).[^>]*><img.src=.([^\"]*).([^>]*>){10}([^<]*)([^>]*>){3}([^<]*)/gi;
+
+	var rst;
+	while((rst = reg.exec(html))!=null){
+		var bm = {};
+		bm.name = rst[2];
+		bm.url = bookUrl(rst[1]);
+		bm.logo = rst[3];
+		bm.newSection = rst[3];
+		bm.updateTime = rst[7];
+		bm.status = rst[5];
+		list.push(bm);
+	}
+	return JSON.stringify(list);
+}
+
+function tags_parse(url,html) {
+	var list = [];
+	var reg = /<li>\s*<div.class=.img.>\s*<a.href=.([^\"]*).[^>]*><img.src=.([^\"]*).([^>]*>){6}([^<]*)([^>]*>){7}([^<]*)<a[^>]*>([^<]*)/gi;
+
+	var rst;
+	while((rst = reg.exec(html))!=null){
+		var bm = {};
+		bm.name = rst[4];
+		bm.url = bookUrl(rst[1]);
+		bm.logo = rst[2];
+		bm.newSection = rst[7];
+		bm.updateTime = rst[6].replace(/\[|：/gi,"");
+		bm.status = "";
+		list.push(bm);
+	}
+	return JSON.stringify(list);
+}
+
+function book_buildUrl(url){
+	return url.replace('//www.','//m.');
+}
+
+function book_parse(url,html) {
+	var $ = cheerio.load(html);
+	
+	var data={};
+	
+	data.name = $('h1').text();
+    data.author = $('.book-d dl').eq(1).children('a').text();
+    data.logo = $('.book-img img').attr('src');
+    data.intro = $('.book-details').text().trim();
+    data.updateTime = "";
+    data.sections = [];
+
+    $('.list-body a').each(function(){
+	    var al = $(this);
+	    if(al.attr('href')){
+		    var sm = {url:urla(al.attr('href')),name:al.text().trim()};
+		    
+			data.sections.push(sm);
+		}    
+    });
+
+
+	return JSON.stringify(data);
+}
+
+
+function section_parse(url,html) {
+	var list = [];
+
+    var j_funs = html.match(/(eval.*)\s*;\s*<\//i)[1];
+    var j_str = unpacker_filter(j_funs);
+
+    var tpf = parseInt(j_str.match(/tpf=(\d+)/i)[1]);
+    var pid = parseInt(j_str.match(/pid=(\d+)/i)[1]);
+    var pic_url = j_str.match(/pic_url='([^']+)'/i)[1];
+    var pic_extname = j_str.match(/pic_extname='([^']+)'/i)[1];
+    var pages = j_str.match(/pages=(\d+)/i)[1];
+
+    for(var i=1; i<=pages; i++){
+        var picUrl = doGetImageUrl(i,pages,tpf,pid,pic_url,pic_extname);
+        list.push(picUrl);
+    }
+
+	return JSON.stringify(list);
+}
+
+function doGetImageUrl(page,pages,tpf,pid,pic_url,pic_extname){
+    page = page < 1 ? 1 : page;
+    page = page > pages ? pages : page;
+    var filename = page.toString();
+    var len = filename.length;
+    for (var i = 1; i <= (tpf + 1 - len); i++) {
+        filename = '0' + filename
+    }
+    filename += '.' + pic_extname;
+
+    return 'http://tkpic.tukucc.com/' + pid + '/' + pic_url + '/' + filename;
+}
+
+
+function unpacker_filter(source)
+{
+    var stripped_source = source.trim();
+    var unpacked = '';
+
+    if (packer.detect(stripped_source)) {
+        unpacked = packer.unpack(stripped_source);
+        if (unpacked !== stripped_source) {
+            return unpacker_filter(unpacked);
+        }
+    }
+
+    return source;
+}
+
+
+var packer = {
+    detect: function (str) {
+        return packer._starts_with(str.toLowerCase().replace(/ +/g, ''), 'eval(function(') ||
+               packer._starts_with(str.toLowerCase().replace(/ +/g, ''), 'eval((function(') ;
+    },
+
+    unpack: function (str) {
+        var unpacked_source = '';
+        if (packer.detect(str)) {
+            try {
+                eval('unpacked_source = ' + str.substring(4) + ';');
+                if (typeof(unpacked_source) == 'string' && unpacked_source) {
+                    str = unpacked_source;
+                }
+            } catch (error) {
+            }
+        }
+        return str;
+    },
+
+    _starts_with: function (str, what) {
+        return str.substr(0, what.length) === what;
+    }
+};
+    ]]>
+		</code>
+    </jscript>
+</site>

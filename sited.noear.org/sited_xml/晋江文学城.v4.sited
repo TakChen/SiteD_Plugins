@@ -1,0 +1,251 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<site ver="4" debug="1" engine="22"  >
+    <ua></ua>
+	<title>晋江文学城</title>
+    <intro>[小说]不腐不开心！晋江文学城/晋江原创网。VIP章节要在插件登录源网站购买。有上百个标签/CP/风格分类！提供原创言情小说，穿越言情小说，纯爱言情小说，同人言情小说，都市言情小说，诗歌/评论/随笔/剧本，更新快。</intro>
+    <author>Guang</author>
+    <url>http://m.jjwxc.net/</url>
+    <expr>jjwxc\.net</expr>
+    <logo></logo>
+    <encode>GB2312</encode>
+	<main dtype="2" dtag="文学">
+        <login run="web" url="http://m.jjwxc.net/" check="login_check" auto="0" />
+		<reward title="打赏" mail="wistn@qq.com">
+			<item txt="插件开发者@Guang的账号" />
+			<item />
+			<item title="支付宝[❤❤广]" url="wistn@qq.com" />
+			<item />
+			<item txt="感谢你对此插件开发者的支持"/>
+		</reward>
+		<home>
+			<hots cache="1d" title="现耽" method="get" showImg="1" h="1.4" w="1" parse="hots_parse" url="http://www.jjwxc.net/fenzhan/dm/bl.html" />
+			<updates cache="1d" title="古耽" method="get" showImg="1" h="1.4" w="1" parse="updates_parse" url="http://www.jjwxc.net/fenzhan/dm/gbl.html" />
+			<tags title="更多">
+	            <tags cache="1d" method="get" header="cookie;referer;Accept=application/json;X-Requested-With=XMLHttpRequest" parse="tags_parse" url="http://m.jjwxc.net/index.php/assort?"/>
+			</tags>
+		</home>
+		<search cache="1d" showImg="0" method="get" parse="search_parse"  url="http://m.jjwxc.net/index.php/assort?fw0=0&amp;fbsj=0&amp;yc0=0&amp;xx0=0&amp;sd0=0&amp;lx0=0&amp;fg0=0&amp;sortType=0&amp;collectiontypes=ors&amp;isfinish=0&amp;searchkeywords=@key&amp;page=@page"   /> 
+        <tag cache="1d" method="get" parse="tag_parse" expr="index" showImg="0"/>
+		<book    cache="1d" method="get" parse="book_parse" expr="book2"/>
+        <section cache="1d"  method="get"  parse="section_parse" header="cookie;referer" />
+    </main>
+    <jscript>
+	    <require>
+			<item url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio" /> 
+		</require>
+		<code>
+        <![CDATA[
+function login_check(url, cookies) {
+	if (!cookies) {
+		return '0';
+	}
+
+	if (cookies.indexOf('sid') > 0) {
+		return '1';
+	} else {
+		return '0';
+	}
+}
+function urla(u) {
+	var host = "http://m.jjwxc.net";
+	if (u.indexOf("http") < 0) {
+		if (u.substr(0, 1) != '/')
+			u = host + '/' + u;
+		else
+			u = host + u;
+	}
+	return encodeURI(u);
+}
+function hots_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	$('.list_04 li').each(function () {
+		var item = $(this);
+		var bm = {};
+	
+		bm.name = item.children('a').eq(1).attr('alt').replace(/^《([\s\S]+)》$/i,'$1');
+		var id=item.children('a').eq(1).attr('href').match(/(\d+)/)[1];
+		bm.url = 'http://m.jjwxc.net/book2/' +id +'?more=1&whole=1';
+		bm.logo = item.find('img').attr('src');
+		list.push(bm);
+	});
+	$('.zzcovers li').each(function () {
+		var item = $(this);
+		var bm = {};
+		bm.name = item.children('a').eq(1).attr('alt').replace(/^《([\s\S]+)》$/i,'$1');
+		var id=item.children('a').eq(1).attr('href').match(/(\d+)/)[1];
+		bm.url = 'http://m.jjwxc.net/book2/' +id +'?more=1&whole=1';
+		bm.logo = item.find('img').attr('src');
+		list.push(bm);
+	});
+	return JSON.stringify(list);
+}
+function updates_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	$('.list_04 li').each(function () {
+		var item = $(this);
+		var bm = {};
+		bm.name = item.children('a').eq(1).attr('alt').replace(/^《([\s\S]+)》$/i,'$1');
+		var id=item.children('a').eq(1).attr('href').match(/(\d+)/)[1];
+		bm.url = 'http://m.jjwxc.net/book2/' +id +'?more=1&whole=1';
+		bm.logo = item.find('img').attr('src');
+		list.push(bm);
+	});
+	$('.zzcovers li').each(function () {
+		var item = $(this);
+		var bm = {};
+		bm.name = item.children('a').eq(1).attr('alt').replace(/^《([\s\S]+)》$/i,'$1');
+		var id=item.children('a').eq(1).attr('href').match(/(\d+)/)[1];
+		bm.url = 'http://m.jjwxc.net/book2/' +id +'?more=1&whole=1';
+		bm.logo = item.find('img').attr('imgsrc');
+		list.push(bm);
+	});
+	return JSON.stringify(list);
+}
+function tags_parse(url, html) {
+	var list =[];
+ 	var $ = cheerio.load(html);
+
+	var bm = null;
+	$('.optionsArea').eq(3).children().slice(1).each(function () {
+		var item = $(this);
+		if (bm) {
+			bm = {};
+		} else {
+			bm = {
+				group : "CP"
+			};
+		}
+		var tagid = item.find('input').attr('value');
+		bm.title = item.find('span').text();
+		
+		bm.url = 'http://m.jjwxc.net/index.php/assort?fw0=0&fbsj=0&yc0=0&xx' + tagid + '=' + tagid + '&sd0=0&lx0=0&fg0=0&bq0=0&sortType=1&collectiontypes=ors&isfinish=0&searchkeywords=&page=@page';
+		list.push(bm);
+	});
+	bm = null;
+	$('.optionsArea').eq(6).children().slice(1).each(function () {
+		var item = $(this);
+		if (bm) {
+			bm = {};
+		} else {
+			bm = {
+				group : "风格"
+			};
+		}
+		var tagid = item.find('input').attr('value');
+		bm.title = item.find('span').text();
+		bm.url = 'http://m.jjwxc.net/index.php/assort?fw0=0&fbsj=0&yc0=0&xx0=0&sd0=0&lx0=0&fg' + tagid + '=' + tagid + '&bq0=0&sortType=1&collectiontypes=ors&isfinish=0&searchkeywords=&page=@page';
+		list.push(bm);
+	});
+
+	bm = null;
+	$('#ajaxCheck .check').slice(1).each(function () {
+		var item = $(this);
+		if (bm) {
+			bm = {};
+		} else {
+			bm = {
+				group : "标签"
+			};
+		}
+		var tagid = item.find('input').attr('value');
+		bm.title = item.find('span').text();
+		bm.url = 'http://m.jjwxc.net/index.php/assort?fw0=0&fbsj=0&yc0=0&xx0=0&sd0=0&lx0=0&fg0=0&bq' + tagid + '=' +tagid + '&sortType=1&collectiontypes=ors&isfinish=0&searchkeywords=&page=@page';
+		list.push(bm);
+	});
+	return JSON.stringify(list);
+}
+function tag_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	$('#diss table tr').slice(1).each(function () {
+		var item = $(this);
+		var bm = {};
+		bm.name = item.find('a').eq(0).text();
+		bm.url = urla(item.find('a').eq(0).attr('href'))+'?more=1&whole=1';
+		bm.logo = '';
+		bm.author = item.find('a').eq(1).text();
+		bm.newSection = '';
+		bm.updateTime = '';
+		bm.status = '';
+		list.push(bm);
+	});
+	return JSON.stringify(list);
+}
+function search_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	$('#diss table tr').slice(1, 16).each(function () {
+		var item = $(this);
+		var bm = {};
+		bm.name = item.find('a').eq(0).text();
+		bm.url = urla(item.find('a').eq(0).attr('href'))+'?more=1&whole=1';
+		bm.logo = 'http://s7.static.jjwxc.net/images/logo.jpg';
+		bm.author = item.find('a').eq(1).text();
+		bm.newSection = '';
+		bm.updateTime = '';
+		bm.status = '';
+		bm.dtag = "文学";
+		list.push(bm);
+	});
+	return JSON.stringify(list);
+}
+function book_parse(url, html) {
+	var $ = cheerio.load(html);
+	var data = {};
+	data.name = $('div.module h2').eq(0).text().replace('首页>', '');
+	data.author = $('div.module ul').eq(0).find('a').eq(0).text();
+	data.logo = 'http://s7.static.jjwxc.net/images/logo.jpg';
+	data.intro = $('div.module ul').eq(0).children('li').eq(0).text().replace(/\s*(\s)/g, '$1');
+	data.isSectionsAsc = 1;
+	data.sections = [];
+	$('div.module ul').eq(0).next('div').find('span').remove();
+	var titles = $('div.module ul').eq(0).next('div').children('a');
+	if (titles.length) {
+		titles.each(function () {
+			var item = $(this);
+			var vip = item.children('.sv');
+			if (vip.text()) {
+				data.sections.push({
+					url : urla(item.attr('href')),
+					name : '[VIP章节要买]' +item.text()
+				});
+			} else {
+				data.sections.push({
+					url : urla(item.attr('href')),
+					name :item.text()
+				});
+			}
+		});
+	}
+	return JSON.stringify(data);
+}
+function section_parse(url, html) {
+	html = html.replace(/\<br\>/gi, '$$').replace(/\<hr.*?\>/gi, '$$');
+	var $ = cheerio.load(html);
+	var list = [];
+	var txt = $('div.module ul').eq(0).text();
+	if (txt) {
+		var tList = txt.split('$');
+		tList.forEach(function (item) {
+			var t1 = item.trim();
+			if (t1.length > 0) {
+				list.push({
+					d : item.trim(),
+					t : 1
+				});
+			}
+		});
+	} else {
+		list.push({
+			d : 'VIP章节，请点击S键登录源网站后订阅访问!',
+			t : 1
+		});
+	}
+	return JSON.stringify(list);
+}
+]]>
+		</code>
+    </jscript>
+</site>

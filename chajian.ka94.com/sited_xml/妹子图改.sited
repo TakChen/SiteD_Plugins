@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sited ver="1" debug="1" private="1" engine="27" schema="1">
+	<meta>
+		<ua></ua>
+		<author>sthLost</author>
+		<contact>346929353@qq.com</contact>
+		<title>妹子图改</title>
+		<intro>[图片]你懂的...</intro>
+		<url>http://www.mzitu.com</url>
+		<expr>\.mzitu\.com</expr>
+		<logo></logo>
+		<encode>utf-8</encode>
+		<reward title="赏" mail="346929353@qq.com">
+			<item txt="欢迎打赏插件开发者sthLost，反馈问题。" />
+			<item />
+			<item txt="点击或支付宝扫描二维码对我打赏" expr="https://qr.alipay.com/aex04209hgmcqxkojxyjib4" logo="http://ww4.sinaimg.cn/mw690/6fd02f65gw1f8opuri5w7j20dw0dwtal.jpg" />
+			<item />
+			<item txt="微信扫描二维码对我打赏" logo="http://ww3.sinaimg.cn/mw690/6fd02f65gw1f8oosionsgj20d30d3jtn.jpg" />
+		</reward>
+	</meta>
+	<main dtype="4">
+		<home>
+			<hots cache="1d" title="首页" method="get" parse="hots_parse" url="http://www.mzitu.com/" />
+			<tags title="分类">
+				<tags cache="1d" method="get" parse="tags_parse" url="http://www.mzitu.com/zhuanti" />
+			</tags>
+		</home>
+		<tag    cache="1d" method="get" parse="tag_parse" />
+		<book   cache="1d" method="get" parseUrl="book_parseUrl" parse="book_parse" />
+	</main>
+	<script>
+		<require>
+			<item url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio" />
+		</require>
+		<code>
+		<![CDATA[
+
+function hots_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('#pins li>a').each(function(){
+		var bm = {};
+		bm.name = $(this).children('img').attr('alt');
+		bm.url  = $(this).attr('href');
+		bm.logo = $(this).children('img').attr('data-original');
+		
+		list.push(bm);
+	});
+	
+	return JSON.stringify(list);
+}
+
+function tags_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	list[0] = {
+		group: '排序',
+		title: '最新',
+		url: 'http://www.mzitu.com/page/@page'
+	};
+	list[1] = {
+		title: '最热',
+		url: 'http://www.mzitu.com/hot/page/@page'
+	};
+	list[2] = {
+		title: '推荐',
+		url: 'http://www.mzitu.com/best/page/@page'
+	};
+	var bm;
+	for(var i=0; i<$('.tags>dt').length-1; i++){
+		bm = null;
+		var ddlen = $('.tags>dt').eq(i).nextAll('dd').length-$('.tags>dt').eq(i+1).nextAll('dd').length-1;
+		$('.tags>dt').eq(i).nextAll('dd').slice(0, ddlen).each(function(){
+			bm = bm? {} : { group: $('.tags>dt').eq(i).text() };
+			bm.title = $(this).children('a').text();
+			bm.url = $(this).children('a').attr('href')+'/page/@page';
+			
+			list.push(bm);
+		});
+	}
+	bm = null;
+	$('.tags>dt').eq(-1).nextAll('dd').each(function(){
+		bm = bm? {} : { group: $('.tags>dt').eq(-1).text() };
+		bm.title = $(this).children('a').text();
+		bm.url = $(this).children('a').attr('href')+'/page/@page';
+		
+		list.push(bm);
+	});
+	
+	return JSON.stringify(list);
+}
+
+function tag_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('#pins li>a').each(function(){
+		var bm = {};
+		bm.name = $(this).children('img').attr('alt');
+		bm.url  = $(this).attr('href');
+		bm.logo = $(this).children('img').attr('data-original');
+		bm.author = '';
+		bm.status = '';
+		bm.newSection = '';
+		bm.updateTime = '';
+		
+		list.push(bm);
+	});
+	
+	return JSON.stringify(list);
+}
+
+function book_parseUrl(url, html) {
+	var $ = cheerio.load(html);
+	var newUrl = url;
+	
+	var pageNum = parseInt($('.pagenavi>a').eq(-2).text());
+	if(pageNum>1){
+		for(var i=2; i<=pageNum; i++){
+			newUrl += ';'+url+'/'+i;
+		}
+	}
+	
+	return newUrl;
+}
+
+function book_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('.main-image img').each(function(){
+		list.push($(this).attr('src'));
+	});
+	
+	return JSON.stringify(list);
+}
+
+		]]>
+		</code>
+	</script>
+</sited>

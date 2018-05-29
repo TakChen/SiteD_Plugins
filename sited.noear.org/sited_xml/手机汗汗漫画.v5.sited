@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<site ver="5" debug="1" engine="15" sds="http://sited.noear.org/api.3/">
+    <ua></ua>
+    <title>手机汗汗漫画</title>
+    <intro>[漫画]一些好看的漫画...</intro>
+    <author>Mrchen</author>
+    <url>http://3gmanhua.com</url>
+    <expr>3gmanhua\.com|m\.ddmm\.cc|goxiee\.com</expr>
+    <logo></logo>
+    <encode>UTF-8</encode>
+	<main dtype="1" durl="http://3gmanhua.com">
+        <reward title="打赏">
+            <item txt="插件开发者@Mrchen的账号" />
+            <item />
+            <item title="支付宝[*宇坤]" url="magicdmer@163.com" />
+            <item />
+            <item txt="感谢你对此插件开发者的支持"/>
+        </reward>
+		
+		<home>
+			<hots  cache="1d"  title="热门" method="get"  parse="hots_parse" url="http://3gmanhua.com/top/h100.htm"/>
+			<tags  title="分类">
+				<item title="全部" url="http://3gmanhua.com/dfcomiclist_@page.htm" />
+				<item title="今日最热" url="http://3gmanhua.com/top/a-@page.htm" />
+				<item title="最多人看" url="http://3gmanhua.com/top/b-@page.htm" />
+				<item title="最受好评" url="http://3gmanhua.com/top/c-@page.htm" />
+			</tags>
+		</home>
+		<search cache="1d" method="get"  parse="search_parse" url="http://3gmanhua.com/comicsearch/s.aspx?s=@key" />
+		<tag  cache="0" addPage="1" method="get"  parse="tags_parse" />
+		<book   cache="1d"  method="get"  parse="book_parse" expr="\/comic\/"/>
+		<section cache="1" method="get"  parse="section_parse" />
+    </main>
+    <jscript>
+		<require>
+			<item url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio" />
+			<item url="http://3gmanhua.com/js/ds.js"/>
+		</require>
+		<code>
+        <![CDATA[
+		
+function htmlEsc(obj) {
+	var arrEntities = {
+		'lt': '<',
+		'gt': '>',
+		'nbsp': ' ',
+		'amp': '&',
+		'quot': '"'
+	};
+	for(var i in obj){
+		var str = obj[i];
+		if(typeof(str) == 'object')
+			str = htmlEsc(str);
+		if(typeof(str) != 'string')
+			continue;
+		obj[i] = str.replace(/<[^<>]+?>/g, '').replace(/&(lt|gt|nbsp|amp|quot);/ig, function(all, t) {
+		return arrEntities[t];
+		}).trim();
+	}
+	return obj;
+}
+
+
+function hots_parse(url,html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	var host = "http://3gmanhua.com";
+
+	$(".section1").each(function(){
+        var img = $(this).find('img');
+        
+		var bm = {};
+		bm.name = img.attr('alt');
+		bm.url  = host + img.parent().attr("href");
+		bm.logo = img.attr('src');
+		
+       
+		list.push(bm);
+	});
+	
+	return JSON.stringify(htmlEsc(list));
+}
+
+function search_parse(url,html) {
+	var $ = cheerio.load(html);
+	var list = [];
+
+	$(".section1").each(function(){
+        var img = $(this).find('img');
+        
+		var bm = {};
+		bm.name = $(this).find('h3').text();
+		bm.url  = img.parent().attr("href");
+		bm.logo = img.attr('src');
+		
+       
+		list.push(bm);
+	});
+	
+	return JSON.stringify(htmlEsc(list));
+}
+
+function tags_parse(url,html) {
+	var $ = cheerio.load(html);
+	var list = [];
+
+	$(".section1").each(function(){
+		var img = $(this).find('img');
+		
+		var bm = {};
+		bm.name = img.attr('alt');
+		bm.url  = img.parent().attr("href");
+		bm.logo = img.attr('src');
+		bm.newSection = "";
+		bm.updateTime = "";
+		bm.status="";
+		
+		list.push(bm);
+	});
+	
+	return JSON.stringify(htmlEsc(list));
+}
+
+function book_parse(url,html) {
+	var $ = cheerio.load(html);
+	var data = {};
+	
+	var childs = $('.con').children();
+	data.name = childs.eq(0).text();
+	data.author = childs.eq(1).text().replace('作者：','');
+	data.logo = '';
+	data.updateTime = childs.eq(5).text().replace('更新日期：','');
+	data.intro = $('meta[name="description"]').attr('content');
+	
+	data.sections = [];
+	
+	$(".zlist a").each(function(){
+
+		var bm = {
+			name: $(this).attr('title'),
+			url: $(this).attr('href')
+		};
+
+		if (bm.url == undefined) return true;
+
+		data.sections.push(bm);
+    });
+
+    return JSON.stringify(htmlEsc(data));
+}
+
+function getDomain(sPath)
+{
+    arrDS = sDS.split('|');
+    var u = "";
+    for(i=0;i<arrDS.length;i++)
+    {
+        if(sPath == (i+1))
+        {
+            u = arrDS[i];
+            break;
+        }
+    }
+    return u;
+}
+
+function unsuan(s,sk)
+{
+	var x = s.substring(s.length-1);
+    var xi="abcdefghijklmnopqrstuvwxyz".indexOf(x)+1;
+    var sk = s.substring(s.length-xi-12,s.length-xi-1);
+    s=s.substring(0,s.length-xi-12);    
+	var k=sk.substring(0,sk.length-1);
+	var f=sk.substring(sk.length-1);
+	for(i=0;i<k.length;i++) {
+	    eval("s=s.replace(/"+ k.substring(i,i+1) +"/g,'"+ i +"')");
+	}
+    var ss = s.split(f);
+	s="";
+	for(i=0;i<ss.length;i++) {
+	    s+=String.fromCharCode(ss[i]);
+    }
+    return s;
+}
+
+function section_parse(url,html) {
+	var $ = cheerio.load(html);
+	
+	var list = [];
+
+	var sPath = html.match("sPath=\"([^\"]*)")[1];
+	var count = parseInt(sPath);
+	var urls_data =html.match("sFiles=\"([^\"]*)")[1];
+	var urls = unsuan(urls_data);
+
+	var ary = urls.split("|");
+	
+	for(var i=0;i<ary.length; i++){
+		var str = ary[i];
+		var server = getDomain(count);
+		list.push(server+str);
+	}
+
+	return JSON.stringify(list);
+}
+    ]]>
+		</code>
+    </jscript>
+</site>

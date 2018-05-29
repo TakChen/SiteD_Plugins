@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sited ver="1" debug="1" engine="27" schema="1">
+    <meta>
+        <url>http://ck101.com/</url>
+        <author>蘋果老司機</author>
+        <title>卡提諾正妹頻道</title>
+        <intro>[圖片]看正妹就像喝水，每天都是必須的。你要的，卡提諾都幫你準備好了！卡提諾論壇就像正妹的海洋，補充你每天所需的能量。台灣、日韓、歐美、東南亞……，各式各樣的極品都在卡提諾論壇！</intro>
+        <expr>ck101\.com</expr>
+        <guid></guid>
+        <encode>utf-8</encode>
+    </meta>
+    <main dtype="4" dtag="圖片">
+
+        <home>
+            <hots title="編輯精選" method="get"   w="23"  h="16"  parse="hots_parse" showImg="2" url="http://ck101.com/beauty/" />
+            <updates title="今日最新" method="get"   w="2"  h="1"  parse="updates_parse" showImg="1" url="http://ck101.com/beauty/" />
+
+            <tags title="圖片">
+            <item title="台灣正妹" showImg="2" url="http://ck101.com/forum-3581-@page.html"  />
+            <item title="日韓正妹" showImg="2" url="http://ck101.com/forum-3582-@page.html"  />
+            <item title="中港澳正妹" showImg="2" url="http://ck101.com/forum-3583-@page.html"  />
+            <item title="東南亞正妹" showImg="2" url="http://ck101.com/forum-3584-@page.html"  />
+            <item title="歐美正妹" showImg="2" url="http://ck101.com/forum-3345-@page.html"  />
+
+        </tags>
+        </home>
+
+        <book cache="0" method="get" w="1" h="1" parse="book_parse" expr="" />
+
+        <tag cache="0" method="get" w="8" h="5" parse="tag_parse" expr="" />
+
+
+    </main>
+    <script>
+        <require>
+            <item url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio"/>
+        </require>
+        <code>
+            <![CDATA[
+
+var SiteD={};
+
+function htmlEsc(obj) {
+	var arrEntities = {
+		'lt': '<',
+		'gt': '>',
+		'nbsp': ' ',
+		'amp': '&',
+		'quot': '"'
+	};
+	for(var i in obj){
+		var str = obj[i];
+		if(typeof(str) == 'object')
+			str = htmlEsc(str);
+		if(typeof(str) != 'string')
+			continue;
+		obj[i] = str.replace(/<[^<>]+?>/g, '').replace(/&(lt|gt|nbsp|amp|quot);/ig, function(all, t) {
+		return arrEntities[t];
+		}).trim();
+	}
+	return obj;
+}
+
+
+function book_parse(url,html)
+{
+    var $ = cheerio.load(html);
+	var list=[];
+
+		var a=html.match(/id="aimg_(.+?)>/g);
+		for(i=0;i<a.length;i++)
+		{
+		    var b=a[i].match(/file="(.+?)"/);
+		    list.push(b[1]);
+		}
+
+		return JSON.stringify(htmlEsc(list));
+
+
+}
+
+function tag_parse(url,html)
+{
+    var $ = cheerio.load(html);
+    var list=[];
+       var normal=html.match(/id=\"normalthread_(\d+?)\"/g);
+       for(i=0;i<normal.length;i++)
+       {
+
+        normal[i]=normal[i].replace('id=\"','');
+        normal[i]='#'+normal[i].replace('\"','');
+
+       }
+          for(i=0;i<normal.length;i++)
+          {
+            $(normal[i]).each(function(){
+
+            var img = $(this).children('tr').children('td').children('.l_sPic').children('a').children('img');
+            var bm = {};
+            bm.name = img.parent().attr('title').trim();
+            bm.url  = img.parent().attr('href');
+            bm.logo = img.attr('src');
+            bm.author = '';
+			bm.newSection = '';
+			bm.updateTime = '';
+			bm.status='';
+            list.push(bm);
+
+       });
+       }
+ return JSON.stringify(htmlEsc(list));
+
+}
+
+function hots_parse(url,html)
+{
+
+
+var $ = cheerio.load(html);
+	var list=[];
+
+		$('ul.bt-main-cont-in li').each(function(){
+
+		var a = $(this).children('.bt-cont-main-txt');
+		var b=  $(this).children('.bt-cont-main-img');
+		var c= b.attr('style');
+		var bm = {};
+		bm.name = a.text().trim();
+		bm.url  = a.attr('href');
+		bm.logo = c.match(/\((.+?)\)/)[1].replace(/'/g,'');
+		bm.author = '';
+		bm.newSection = '';
+		bm.updateTime = '';
+		bm.status='';
+
+		list.push(bm);
+	});
+
+	return JSON.stringify(list);
+
+
+}
+
+function updates_parse(url,html)
+{
+
+
+var $ = cheerio.load(html);
+	var list=[];
+
+		$('ul.bt-slide-one li').each(function(){
+
+		var a = $(this).children('.bt-title-slide-in');
+		var b=  $(this).find('.bt-slide-img');
+		var c=  b.attr('style');
+		var d= $(this).children('a');
+		var bm = {};
+		bm.name = d.text().trim();
+		bm.url  = d.attr('href');
+		bm.logo = c.match(/\((.+?)\)/)[1].replace(/'/g,'');
+		bm.author = '';
+		bm.newSection = '';
+		bm.updateTime = '';
+		bm.status='';
+
+		list.push(bm);
+	});
+
+
+	return JSON.stringify(list);
+
+
+}
+
+    ]]>
+        </code>
+    </script>
+</sited>

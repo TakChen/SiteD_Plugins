@@ -1,0 +1,212 @@
+<!--?xml version="1.0" encoding="utf-8" ?-->
+<site ver="2" debug="1" engine="11">
+    <ua></ua>
+    <title>漫客栈</title>
+    <intro>[漫画]漫客栈（即知音漫客）-中国原创在线漫画第一站</intro>
+    <author>seiya</author>
+    <url>http://www.mkzhan.com</url>
+    <expr>\.mkzhan\.com</expr>
+    <logo></logo>
+    <encode>utf-8</encode>
+    <main dtype="1">
+	    <reward title="反馈" mail="seiya@noear.org">
+			<item txt="如果有问题，请用邮件反馈：" />
+			<item />
+			<item txt="seiya@noear.org"/>
+		</reward>
+		
+        <home>
+            <hots cache="1d" title="精品" method="get" w="3" h="4" parse="hots_parse" url="http://www.mkzhan.com/comic/clist/0-0-0-0-0-5-2-1.html" />
+            <updates cache="1d" title="更新" method="get" parse="updates_parse" url="http://www.mkzhan.com/comic/clist/0-0-0-0-0-2-1-1.html" />
+            <tags title="分类">
+	            <item group="版权" title="独家VIP" url="http://www.mkzhan.com/comic/clist/0-0-0-0-0-1-1-@page.html" />
+				<item title="杂志作品" url="http://www.mkzhan.com/comic/clist/0-0-0-0-0-5-1-@page.html" />
+				<item title="作者作品" url="http://www.mkzhan.com/comic/clist/0-0-0-0-0-2-1-@page.html" />
+				<item title="画友作品" url="http://www.mkzhan.com/comic/clist/0-0-0-0-0-3-1-@page.html" />
+				
+				<item group="类型" title="故事漫画" url="http://www.mkzhan.com/comic/clist/0-0-0-31-0-0-1-@page.html" />
+				<item title="四格漫画" url="http://www.mkzhan.com/comic/clist/0-0-0-32-0-0-1-@page.html" />
+				<item title="绘本" url="http://www.mkzhan.com/comic/clist/0-0-0-33-0-0-1-@page.html" />
+				<item title="插图" url="http://www.mkzhan.com/comic/clist/0-0-0-34-0-0-1-@page.html" />
+				
+				<item group="题材" title="搞笑" url="http://www.mkzhan.com/comic/clist/0-1-0-0-0-0-1-@page.html" />
+				<item title="魔幻" url="http://www.mkzhan.com/comic/clist/0-2-0-0-0-0-1-@page.html" />
+				<item title="生活" url="http://www.mkzhan.com/comic/clist/0-3-0-0-0-0-1-@page.html" />
+				<item title="恋爱" url="http://www.mkzhan.com/comic/clist/0-4-0-0-0-0-1-@page.html" />
+				<item title="动作" url="http://www.mkzhan.com/comic/clist/0-5-0-0-0-0-1-@page.html" />
+				<item title="科幻" url="http://www.mkzhan.com/comic/clist/0-6-0-0-0-0-1-@page.html" />
+				<item title="战争" url="http://www.mkzhan.com/comic/clist/0-7-0-0-0-0-1-@page.html" />
+				<item title="体育" url="http://www.mkzhan.com/comic/clist/0-8-0-0-0-0-1-@page.html" />
+				<item title="推理" url="http://www.mkzhan.com/comic/clist/0-9-0-0-0-0-1-@page.html" />
+				<item title="耽美" url="http://www.mkzhan.com/comic/clist/0-10-0-0-0-0-1-@page.html" />
+				<item title="恐怖" url="http://www.mkzhan.com/comic/clist/0-11-0-0-0-0-1-@page.html" />
+				<item title="校园" url="http://www.mkzhan.com/comic/clist/0-18-0-0-0-0-1-@page.html" />
+				<item title="其它" url="http://www.mkzhan.com/comic/clist/0-16-0-0-0-0-1-@page.html" />
+            </tags>
+        </home>
+        <search cache="1d" method="get"  parse="search_parse" url="http://www.mkzhan.com/comic/so/@key-0-0-@page.html" />
+         <tag cache="1d" method="get" parse="tags_parse" />
+         <book cache="1d" method="get" parse="book_parse" expr="com\/\d+\/$" header="cookie;referer" addCookie="isAdult=1" />
+         <section cache="1" method="get" parse="section_parse" trySuffix=".jpg|.png" header="cookie;referer" addCookie="isAdult=1"/>
+    </main>
+    <jscript>
+		<require>
+			<item url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio" />
+		</require>
+    <code>
+        <![CDATA[
+function urla(u) {
+	var host = "http://www.mkzhan.com";
+	if (u.indexOf("http")<0) {
+		if (u.substr(0, 1) != '/')
+			u = host + '/' + u;
+		else
+			u = host + u;
+	}
+	return encodeURI(u);
+}
+
+function htmlEsc(obj) {
+	var arrEntities = {
+		'lt': '<',
+		'gt': '>',
+		'nbsp': ' ',
+		'amp': '&',
+		'quot': '"'
+	};
+	for(var i in obj){
+		var str = obj[i];
+		if(typeof(str) == 'object')
+			str = htmlEsc(str);
+		if(typeof(str) != 'string')
+			continue;
+		obj[i] = str.replace(/<[^<>]+?>/g, '').replace(/&(lt|gt|nbsp|amp|quot);/ig, function(all, t) {
+		return arrEntities[t];
+		}).trim();
+	}
+	return obj;
+}
+
+function hots_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('.all_list').find('li').each(function(){
+		var img = $(this).find('.tj_jianjie_img');
+		
+		var bm = {};
+		bm.name = img.attr('title');
+		bm.url  = urla(img.parent().attr('href'));
+		bm.logo = urla(img.attr('src'));
+
+		list.push(bm);
+	});
+
+	return JSON.stringify(list);
+}
+
+function search_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('.all_list').find('li').each(function(){
+		var item = $(this);
+		var img = item.find('.tj_jianjie >img');
+		
+		var bm = {};
+		bm.name = img.attr("title");
+		bm.url = urla(img.parent().attr('href'));
+		bm.logo = urla(img.attr('src'));
+		bm.author = item.find(".author > span").text().replace('作者：','');
+		bm.newSection = item.find('.update_num').text();
+		bm.updateTime = "";
+		list.push(bm);
+	});
+
+	return JSON.stringify(list);
+}
+
+function updates_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('.all_list').find('li').each(function(){
+		var item = $(this);
+		var img = item.find('.tj_jianjie_img');
+		
+		var bm = {};
+		bm.name = img.attr("title");
+		bm.url = urla(img.parent().attr('href'));
+		bm.logo = urla(img.attr('src'));
+		bm.newSection = item.find('.update_num').text();
+		bm.updateTime = "";
+		list.push(bm);
+	});
+	return JSON.stringify(list);
+}
+
+function tags_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('.all_list').find('li').each(function(){
+		var item = $(this);
+		var img = item.find('.tj_jianjie_img');
+		
+		var bm = {};
+		bm.name = img.attr("title");
+		bm.url = urla(img.parent().attr('href'));
+		bm.logo = urla(img.attr('src'));
+		bm.author = item.find(".author > span").text().replace('作者：','');
+		bm.newSection = item.find('.update_num').text();
+		bm.updateTime = '';
+		list.push(bm);
+	});
+
+	return JSON.stringify(htmlEsc(list));
+}
+
+function book_parse(url, html) {
+	var $ = cheerio.load(html);
+	
+	var data = {};
+	
+	data.name = $('.biao_top>h1').text();
+	data.author = $('.zhuzhe').text();
+	data.logo = urla($('.tu_introduced img').attr('src'));
+	data.updateTime = ''
+	data.intro = $('.intro1').eq(0).text();
+	
+	data.sections = [];
+
+	$('.Chapter_lists li>a').each(function(){
+		var bm = {
+			name: $(this).attr('title'),
+			url: urla($(this).attr('href'))
+		};
+		data.sections.splice(0, 0, bm);
+	});
+	
+	return JSON.stringify(htmlEsc(data));
+}
+
+function section_parse(url, html) {
+	var listJS = html.match(/comicimg=([^\]]*\])/i)[1];
+	var jList = JSON.parse(listJS);
+
+	var img_host = "http://img1.comic.zymk.cn/comic";
+	
+	var list = [];
+	for (var i = 0; i < jList.length; i++) {
+		list.push(img_host + jList[i]);
+	}
+
+	return JSON.stringify(list);
+
+}
+
+            ]]>
+    </code>
+
+    </jscript>
+</site>

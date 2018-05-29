@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<site ver="4" debug="1" engine="12">
+    <ua></ua>
+    <title>MangaReader</title>
+    <intro>Read Manga Online for Free. Online Manga Reader</intro>
+    <author>Seiko</author>
+    <url>http://www.mangareader.net</url>
+    <expr>\.mangareader\.net</expr>
+    <logo></logo>
+	<encode>utf-8</encode>
+	<main dtype="1">
+        <reward title="打赏">
+            <item txt="插件开发者@Seiko的账号" />
+            <item />
+            <item title="支付宝[**飞]" url="605590140@qq.com" />
+            <item txt="感谢您使用此插件." />
+            <item />
+            <item txt="感谢你对此插件开发者的支持"/>
+        </reward>
+		<home>
+        	<hots cache="1d" title="Hot" method="get" parse="ht_parse" url="http://www.mangareader.net/popular" />
+            <updates cache="1d" title="Updates" method="get" parse="updates_parse" url="http://www.mangareader.net/" />
+			<tags title="Tags" >
+				<item title="action"    url="http://www.mangareader.net/popular/action" />
+                <item title="adventure" url="http://www.mangareader.net/popular/adventure" />
+                <item title="drama"     url="http://www.mangareader.net/popular/drama" />
+                <item title="ecchi"     url="http://www.mangareader.net/popular/ecchi" />
+                <item title="fantasy"   url="http://www.mangareader.net/popular/fantasy" />
+                <item title="harem"     url="http://www.mangareader.net/popular/harem" />
+                <item title="horror"    url="http://www.mangareader.net/popular/horror" />
+                <item title="mecha"     url="http://www.mangareader.net/popular/mecha" />
+                <item title="romance"   url="http://www.mangareader.net/popular/romance" />
+                <item title="school"    url="http://www.mangareader.net/popular/school-life" />
+                <item title="sci-fi"    url="http://www.mangareader.net/popular/sci-fi" />
+                <item title="shoujoai"  url="http://www.mangareader.net/popular/shoujoai" />
+                <item title="yaoi"      url="http://www.mangareader.net/popular/yaoi" />
+                <item title="sports"    url="http://www.mangareader.net/popular/sports" />
+                <item title="psycholog" url="http://www.mangareader.net/popular/psychological" />
+			</tags>
+		</home>
+        <search  cache="1d" method="get"  parse="search_parse" url="http://www.mangareader.net/search/?w=@key&amp;rd=0&amp;status=0&amp;order=0&amp;genre=&amp;p=0" />
+		<tag     cache="0"  method="get" parse="ht_parse" buildUrl="tag_buildUrl" />
+        <book    cache="1d" method="get" parse="book_parse" />
+        <section cache="1"  method="get" parse="section_parse" header="cookie;referer" parseUrl="section_parse_url" />
+    </main>
+    <jscript>
+        <require>
+            <item url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio" />
+        </require>
+		<code>
+        <![CDATA[
+
+
+function urla(url){
+	if(url.indexOf("http")>=0)
+		return url;
+	else
+		return "http://www.mangareader.net" + url;
+}
+
+function ht_parse(url,html) {
+    var $ = cheerio.load(html);
+    var list = [];
+    
+    $('.mangaresultinner').each(function() {
+        var item  = $(this);
+        
+        var bm = {};
+        bm.name = item.find('h3 a').text();
+        bm.url  = urla(item.find('h3 a').attr('href'));
+        bm.logo = item.children('.imgsearchresults').attr('style').match(/\'([^\']*)/)[1];
+        list.push(bm);
+    });
+    return JSON.stringify(list);
+}
+
+function tag_buildUrl(url,page){
+    if(page==1)
+        return url;
+    else{
+        page=page-1;
+        return url+'/'+(page*30);
+    }
+}
+
+
+function search_parse(url,html) {
+    var $ = cheerio.load(html);
+    var list = [];
+    var ban1 = 'false';
+    var ban2 = 'false';
+    
+    $('.mangaresultinner').each(function() {
+        var item  = $(this);
+        
+        var bm = {};
+        var dd = item.find('h3 a').text();
+        if (dd=="Naruto") {
+            ban1 = 'true';
+        }
+        if (dd=="Bleach") {
+            ban2 = 'true';
+        }
+        if (ban1 !='false' && ban2 !='false') {
+            list = [];
+            return;
+        }
+        
+        bm.name = dd;
+        bm.url  = urla(item.find('h3 a').attr('href'));
+        bm.logo = item.children('.imgsearchresults').attr('style').match(/\'([^\']*)/)[1];
+        list.push(bm);
+    });
+    return JSON.stringify(list);
+}
+
+
+
+function updates_parse(url,html) {
+    var list = [];
+    var reg  = /<a.class=.chapter..href=.([^\"]*)..<strong\>([^\<]*)<\/strong\>/gi;
+
+    var rst;
+    while((rst = reg.exec(html))!=null){
+        var bm = {};
+        bm.name= rst[2];
+        bm.url = urla(rst[1]);
+        bm.updateTime = "Today";
+        bm.newSection = "";
+
+        list.push(bm);
+    }
+    return JSON.stringify(list);
+}
+
+
+
+function book_parse(url, html) {
+    var $ = cheerio.load(html);
+    
+    var data = {};
+    
+    data.name = $('.propertytitle').eq(0).next().text().trim();
+    data.author = $('.propertytitle').eq(4).next().text().trim();
+    data.logo = $('#mangaimg').children('img').attr('src');
+    data.updateTime = '';
+    data.intro = '';
+    
+    data.sections = [];
+    $('#listing').find('a').each(function(){
+        var item = $(this);
+        var bm = {name:item.text(), url:urla(item.attr('href'))};
+        data.sections.unshift(bm);
+    });
+    return JSON.stringify(data);
+}
+
+
+function section_parse_url(url,html) {
+    var list = "";
+    
+    var rst = html.match(/<\/select>.of.([^\<]*)<\/div>/i)[1];
+    for (i=1;i<Number(rst)+1;i++) {
+        var u1 = url+'/'+i;
+        list = list + u1 +";";
+    }
+    return list;
+}
+
+function section_parse(url,html) {
+    var $ = cheerio.load(html);
+    var list = [];
+    var img = $('#img').attr('src');
+    list.push(img);
+    
+    return JSON.stringify(list);
+}
+
+
+    ]]>
+		</code>
+    </jscript>
+</site>

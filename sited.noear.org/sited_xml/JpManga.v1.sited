@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<site ver="1" debug="1" engine="12">
+    <ua></ua>
+    <title>JpManga</title>
+    <intro>jpmanga is the fastest and most professional special website for updating Manga Naruto 687 and Manga One Piece 755 and Manga Bleach and Manga One Piece。</intro>
+    <author>seiya</author>
+    <alert>一搜索就会变成中文界面，所以取消了搜索功能</alert>
+    <url>http://en.jpmanga.com</url>
+    <expr>\.jpmanga\.com</expr>
+    <logo></logo>
+	<encode>utf-8</encode>
+	<main dtype="1">
+		<reward title="反馈" mail="seiya@noear.org">
+			<item txt="如果有问题，请用邮件反馈：" />
+			<item />
+			<item txt="seiya@noear.org"/>
+		</reward>
+		
+		<home>
+        	<hots cache="1d" title="Hot" method="get" parse="hots_parse" url="http://en.jpmanga.com/" >
+	        	<updates parse="updates_parse" />
+	        	<tags parse="tags_parse" />
+        	</hots>
+            <updates title="Updates" />
+			<tags title="Tags" />
+		</home>
+		<tag     cache="0"  method="get" parse="tag_parse"  />
+        <book    cache="1d" method="get" parse="book_parse" expr="manga-" />
+        <section cache="1"  method="get" parse="section_parse" parseUrl="section_parseUrl" header="cookie;referer;Accept=*/*;X-Requested-With=XMLHttpRequest"  />
+    </main>
+    <jscript>
+	    <require>
+			<item url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio" />
+		</require>
+		<code>
+        <![CDATA[
+
+function urla(u) {
+	var host = "http://en.jpmanga.com";
+	if (u.indexOf("http")<0) {
+		if (u.substr(0, 1) != '/')
+			u = host + '/' + u;
+		else
+			u = host + u;
+	}
+	return encodeURI(u);
+}
+
+function hots_parse(url,html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('.z03 li').each(function(){
+		var slf  = $(this);
+		
+		var img = slf.find('img');
+		
+		var bm = {};
+		bm.name = img.parent().attr('title');
+		bm.url  = urla(img.parent().attr('href'));
+		bm.logo = urla(img.attr('src'));
+
+		if(bm.url.indexOf('dm5.com')<0){
+			list.push(bm);
+		}
+	});
+
+	return JSON.stringify(list);
+}
+
+function updates_parse(url,html) {
+    var $ = cheerio.load(html);
+	var list = [];
+	
+	$('.z04 > .z04b > ul').each(function(){
+		var slf  = $(this);
+		var al = slf.find('span').eq(0).next();
+		
+		var bm = {};
+		bm.name = al.text();
+		bm.url  = urla(al.attr('href'));
+		bm.updateTime = "Today";
+        bm.newSection = slf.children('.mhx').children('a').eq(0).text();
+
+		list.push(bm);
+	});
+
+	return JSON.stringify(list);
+}
+
+function tags_parse(url,html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('.k1nr4 li').each(function(){
+		var slf  = $(this);
+		
+		var bm = {};
+		bm.title = slf.children('a').text();
+		bm.url  = urla(slf.children('a').attr('href')).replace(/\/$/i,'-p@page/');
+
+		list.push(bm);
+	});
+
+	return JSON.stringify(list);
+}
+
+
+function search_parse(url,html) {
+    var $ = cheerio.load(html);
+	var list = [];
+	
+	$('div.lvkx3').each(function(){
+		var img = $(this).find('img');
+		
+		var bm = {};
+		bm.name = $(this).find('h1 a').text();
+		bm.url = urla(img.parent().attr('href'));
+		bm.logo = urla(img.attr('src'));
+		
+		bm.author = '';
+		bm.newSection = $(this).find('.zl a').eq(0).text();
+		bm.updateTime = '';
+		bm.status = '';
+		list.push(bm);
+	});
+
+	return JSON.stringify(list);
+}
+
+function tag_parse(url,html){
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('div.lvkx3').each(function(){
+		var img = $(this).find('img');
+		
+		var bm = {};
+		bm.name = $(this).find('h1 a').text();
+		bm.url = urla(img.parent().attr('href'));
+		bm.logo = urla(img.attr('src'));
+		
+		bm.author = '';
+		bm.newSection = $(this).find('.zl a').eq(0).text();
+		bm.updateTime = '';
+		bm.status = '';
+		list.push(bm);
+	});
+
+	return JSON.stringify(list);
+}
+
+
+function book_parse(url, html) {
+	var $ = cheerio.load(html);
+	
+    var data={};
+
+    data.name = $('.k1sy1 h1').text();
+    data.author = $('.k1sy2 > li').eq(4).children('a').text();
+    data.logo = $('.k1sy1 img').attr('src');
+    data.intro = $('.k1sy31 > span').text();
+    data.updateTime = "";
+    data.sections = [];
+
+    $('.c_chapter > tr').each(function(){
+	    var slf = $(this);
+	    var al = slf.find('a').eq(0);
+	    if(al.attr('href')){
+		    var sm = {url:urla(al.attr('href')),name:al.text()};
+
+			data.sections.push(sm);
+	    }
+    });
+    
+    return JSON.stringify(data);
+}
+
+function section_parseUrl(url,html){
+	var cid = url.match(/-(\d+)\/$/i)[1];
+	var num = parseInt(html.match(/span>\/(\d+)/i)[1]);
+	var urls = '';
+	for(var i=1; i<=num; i++){
+		if(i%2>0){
+			urls+=(url+'chapterfun.ashx?cid='+cid+'&page='+i+'&language=3&key=&maxcount=10;');
+		}
+	}
+	
+	if(urls.length>0){
+		urls = urls.substr(0,urls.length-1);
+	}
+	
+	return urls;
+}
+
+function section_parse(url,html) {
+    var list = [];
+
+	var jList = eval(html);
+	
+	jList.forEach(function(u1){
+		list.push(u1);
+	});
+    
+    return JSON.stringify(list);
+}
+
+
+    ]]>
+		</code>
+    </jscript>
+</site>

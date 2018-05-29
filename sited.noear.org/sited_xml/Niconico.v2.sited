@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<site ver="2" debug="1" engine="19">
+	<title>Niconico</title>
+    <intro>Niconicoはドワンゴが運営する日本最大級の動画サービスです。動画にコメントを付けて楽しむニコニコ動画や、生放送番組にリアルタイムでコメントを付けられるニコニコ生放送のほか、画像・イラスト・電子書籍を楽しむニコニコ静画など、ゲームや音楽、エンターテイメントは全てniconicoで！</intro>
+    <author>zsxeee</author>
+    <url>http://sp.nicovideo.jp</url>
+    <expr>sp\.nicovideo\.jp</expr>
+    <logo></logo>
+    <encode>UTF-8</encode>
+    <main dtype="3">
+        <login run="web" check="login_check" auto="1" url="https://account.nicovideo.jp/login?next_url=%2F&amp;site=spniconico"/>
+        <home>  
+            <hots  cache="10m"   title="ランキング" method="get" w="5" h="4"  parse="hots_parse" url="http://sp.nicovideo.jp/ranking?cp_in=rk_tp_rk" header="cookie"/>
+            <tags  title="カテゴリ" method="get" parse="tags_parse">
+                <item title="エンタメ・音楽" url="http://sp.nicovideo.jp/tag/g_ent2?cp_in=tg_tp_category" />
+                <item title="生活・一般・スポ" url="http://sp.nicovideo.jp/tag/g_life2?cp_in=tg_tp_category" />
+                <item title="政治" url="http://sp.nicovideo.jp/tag/g_politics?cp_in=tg_tp_category" />
+                <item title="科学・技術" url="http://sp.nicovideo.jp/tag/g_tech?cp_in=tg_tp_category" />
+                <item title="アニメ・ゲーム・絵" url="http://sp.nicovideo.jp/tag/g_culture2?cp_in=tg_tp_category" />
+                <item title="その他" url="http://sp.nicovideo.jp/tag/g_other?cp_in=tg_tp_category" />
+            </tags>
+        </home>
+        <search cache="60m"  method="get" parse="search_parse" url="http://sp.nicovideo.jp/search/@key"  header="cookie"/>
+        <tag cache="10m" method="get" parse="tags_parse" header="cookie"/>
+        <book cache="0"  method="get"  parse="book_parse" expr="jp\/watch\/" header="cookie"/>
+        <section run="web" cache="1" method="get" buildUrl="section_buildUrl" parseUrl="section_parseUrl" parse="section_parse"  header="cookie"/>
+		<object header="cookie;referer;Content-Type=video/mp4" />
+    </main>
+    <jscript>
+	    <require>
+			<item encode="utf-8" url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio" />
+		</require>
+        <code>
+            <![CDATA[
+            
+function login_check(url,cookies){
+	if(!cookies){
+		return '0';
+	}
+	
+	if(cookies.indexOf('user_session=user_session_')>0){
+		return '1';
+	}else{
+		return '0';
+	}
+}	
+
+function hots_parse(url,html) {
+    var $ = cheerio.load(html);
+	var list = [];
+	
+	$("[style='position:relative;']").each(function(){
+		var item = $(this);
+		
+		var bm = {};
+		bm.name = item.find('.itemTitle').text().trim();
+		bm.url = item.children('a').attr('href');
+		bm.logo = item.find('img').attr('src');
+		list.push(bm);
+	});
+
+	return JSON.stringify(list);
+
+}
+
+function search_parse(url,html) {
+    var $ = cheerio.load(html);
+	var list = [];
+	
+	$(".itemBlk").parent("li").each(function(){
+		var item = $(this);
+		
+		var bm = {};
+		bm.name = item.find('p.itemTitle').text().trim();
+		bm.url = item.children('a').attr('href');
+		bm.logo = item.find('img').attr('src');
+		list.push(bm);
+	});
+	
+	return JSON.stringify(list);
+}
+
+
+function tags_parse(url,html) {
+    var $ = cheerio.load(html);
+	var list = [];
+	
+	$(".itemBlk").parent("li").each(function(){
+		var item = $(this);
+		
+		var bm = {};
+		bm.name = item.find('p.itemTitle').text().trim();
+		bm.url = item.children('a').attr('href');
+		bm.logo = item.find('img').attr('src');
+		list.push(bm);
+	});
+	return JSON.stringify(list);
+}
+
+var g_sec={};
+
+function book_parse(url,html) {
+	var $ = cheerio.load(html);
+	var data={};
+	
+	
+	data.name = $('.video-title').text().trim();
+	data.author = $('.author-name span').text().trim();
+	data.logo = $('#jsThumbnail').attr('src');
+	data.updateTime=$('.video-postdate').text().trim();
+	data.intro  = $(".cols.video-description").text().trim();
+	
+	data.sections=[{url:url,name:"ビデオを再生"}];
+
+	var j1 = $('#jsDataContainer');
+	g_sec.api1 = j1.attr('data-watch_api_url');
+	g_sec.wid  = j1.attr('data-watch_id');
+	
+	return JSON.stringify(data);
+}
+
+function section_buildUrl(url){
+	return g_sec.api1;
+}
+
+function section_parseUrl(url,html) {
+    var j2 = JSON.parse(html);
+	
+	return 'http://flapi.nicovideo.jp/api/getflv?device=iphone3&watch_auth_key='+j2.watchAuthKey+'&v='+g_sec.wid+'&eco=1';
+}
+
+function section_parse(url,html) {
+    var tvurl = html.match(/url=([^&]*)/i)[1];
+	return unescape(tvurl)
+}
+
+    ]]>
+        </code>
+		<!--smile[^\.]*\.nicovideo\.jp%[^%]*%[^%]*%[^%]*-->
+    </jscript>
+</site>

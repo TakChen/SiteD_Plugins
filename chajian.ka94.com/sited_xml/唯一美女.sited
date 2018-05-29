@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<site ver="1" debug="1" engine="17" >
+    <ua></ua>
+    <url>http://http://www.mmonly.cc/mmtp/</url>
+    <author>苹果老司机</author>
+    <title>唯一美女</title>
+    <intro>[图片]唯一图库美女图片栏目主要提供：性感美女图片、丝袜美女图片、韩国、外国美女图片、比基尼、内衣美女图片、清纯、长腿美女图片等。美女即指拥有美丽容貌的女子，美女有成熟风韵、俊秀俊美、艳美如花、可爱等类型。美女应有着如一道明亮风景线的好身材及端庄的气质。</intro>
+    <expr>www\.mmonly\.cc\/mmtp\/</expr>
+    <logo></logo>
+    <guid>36d00a88f0494028a87f5ab6c238e140</guid>
+    <encode>gb2312</encode>
+    <main dtype="4" dtag="图片">
+        <home>
+            <hots title="最新" method="get"   w="3"  h="4"  parse="hots_parse" showImg="2" url="http://www.mmonly.cc/mmtp/" />
+            <tags title="更多" method="get" showImg="1" >
+                <item title="性感美女" url="http://www.mmonly.cc/mmtp/xgmn/list_10_@page.html" />
+                <item title="丝袜美女" url="http://www.mmonly.cc/mmtp/swmn/list_11_@page.html" />
+                <item title="韩国美女" url="http://www.mmonly.cc/mmtp/hgmn/list_12_@page.html" />
+                <item title="外国美女" url="http://www.mmonly.cc/mmtp/wgmn/list_13_@page.html" />
+                <item title="比基尼美女" url="http://www.mmonly.cc/mmtp/bjnmn/list_14_@page.html" />
+                <item title="内衣美女" url="http://www.mmonly.cc/mmtp/nymn/list_15_@page.html" />
+                <item title="清纯美女" url="http://www.mmonly.cc/mmtp/qcmn/list_16_@page.html" />
+                <item title="长腿美女" url="http://www.mmonly.cc/mmtp/ctmn/list_17_@page.html" />
+                <item title="美女明星" url="http://www.mmonly.cc/mmtp/mnmx/list_18_@page.html" />
+                <item title="街拍美女" url="http://www.mmonly.cc/mmtp/jpmn/list_19_@page.html" />
+
+    </tags>
+        </home>
+        <tag cache="0"  method="get"  w="3" h="4" parse="tag_parse"  expr="mmtp" />
+        <book cache="0" method="get"  w="3" h="4" parseUrl="book_parseUrl" parse="book_parse"  expr="mmtp" />
+
+    </main>
+    <jscript>
+        <require>
+            <item url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio" />
+        </require>
+        <code>
+            <![CDATA[
+
+var SiteD={};
+
+function utf8_decode(str_data) {
+	var tmp_arr = [], i = 0, ac = 0, c1 = 0, c2 = 0, c3 = 0;
+    str_data += '';
+    while ( i < str_data.length ) {
+        c1 = str_data.charCodeAt(i);
+        if (c1 < 128) {
+            tmp_arr[ac++] = String.fromCharCode(c1);
+            i++;
+        } else if ((c1 > 191) && (c1 < 224)) {
+            c2 = str_data.charCodeAt(i+1);
+            tmp_arr[ac++] = String.fromCharCode(((c1 & 31) << 6) | (c2 & 63));
+            i += 2;
+        } else {
+            c2 = str_data.charCodeAt(i+1);
+            c3 = str_data.charCodeAt(i+2);
+            tmp_arr[ac++] = String.fromCharCode(((c1 & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+            i += 3;
+        }
+    }
+    return tmp_arr.join('');
+}
+
+function urla(u) {
+	if(u){
+		var host = "http://pic.91.com";
+		if (u.indexOf("http")<0) {
+			if (u.substr(0, 1) != '/')
+				u = host + '/' + u;
+			else
+				u = host + u;
+		}
+		return encodeURI(u);
+	}
+	return "";
+}
+
+function htmlEsc(obj) {
+	var arrEntities = {
+		'lt': '<',
+		'gt': '>',
+		'nbsp': ' ',
+		'amp': '&',
+		'quot': '"'
+	};
+	for(var i in obj){
+		var str = obj[i];
+		if(typeof(str) == 'object')
+			str = htmlEsc(str);
+		if(typeof(str) != 'string')
+			continue;
+		obj[i] = str.replace(/<[^<>]+?>/g, '').replace(/&(lt|gt|nbsp|amp|quot);/ig, function(all, t) {
+		return arrEntities[t];
+		}).trim();
+	}
+	return obj;
+}
+
+function hots_parse(url, html) {
+
+	var $ = cheerio.load(html);
+	var list=[];
+
+		$('.focusbox .imgwkc').each(function(){
+
+		var a= $(this).children('a');
+		var img= $(this).find('img');
+
+		var bm = {};
+		bm.name = img.attr('alt');
+		bm.url  = a.attr('href');
+		bm.logo = img.attr('src');
+		bm.author = '';
+		bm.newSection = '';
+		bm.updateTime = '';
+		bm.status='';
+
+		list.push(bm);
+	});
+
+
+	return JSON.stringify(list);
+}
+
+function book_parseUrl(url,html)
+{
+
+    var $ = cheerio.load(html);
+	var newUrl=url+';';
+
+    var pt=$('.pages ul').children('li').children('a:first-child').text().replace('共','').replace('页:','');
+    var a=parseInt(pt);
+	for(i=0;i<a-1;i++)
+	{
+	    newUrl+=url.replace('.html','')+'_'+(i+2)+'.html'+';';
+	}
+
+	return newUrl;
+}
+
+function tag_parse(url,html)
+{
+        var $ = cheerio.load(html);
+	    var list=[];
+		$('.ABox > a').each(function(){
+		var a= $(this);
+		var img= a.children('img');
+
+		var bm = {};
+		bm.name = img.attr('alt');
+		bm.url  = a.attr('href');
+		bm.logo = img.attr('src');
+		bm.author = '';
+		bm.newSection = '';
+		bm.updateTime = '';
+		bm.status='';
+
+		list.push(bm);
+	});
+
+
+	return JSON.stringify(list);
+}
+
+	function book_parse(url,html)
+{
+	var $ = cheerio.load(html);
+
+	if(SiteD.ver && SiteD.ver>=25){
+
+	var list=[];
+
+	$('#big-pic > p').each(function(){
+
+        var a= $(this).children('a');
+        var img= a.children('img');
+
+		list.push(img.attr('src'));
+
+		});
+		return JSON.stringify(htmlEsc(list));
+    }
+	else
+	{
+	var data = {};
+	data.name = '';
+	data.sections = [];
+
+
+	$('#big-pic > p').each(function(){
+
+        var a= $(this).children('a');
+        var img= a.children('img');
+
+
+		var bm = {
+			name: '',
+			url: img.attr('src')
+		};
+        data.sections.push(bm);
+
+		});
+
+	}
+	return JSON.stringify(htmlEsc(data));
+}
+
+
+
+
+
+
+
+    ]]>
+        </code>
+    </jscript>
+</site>

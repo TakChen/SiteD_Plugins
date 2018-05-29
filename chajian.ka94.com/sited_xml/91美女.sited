@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<site ver="1" debug="1" engine="17" >
+    <ua></ua>
+	<url>http://pic.91.com/girl/</url>
+	<author>苹果老司机</author>
+    <title>91悦图美女频道</title>
+    <intro>[图片]百度旗下91悦图美女频道</intro>
+    <expr>pic\.91\.com\/girl/</expr>
+    <logo></logo>
+    <guid>2c148b038f4b451b855a5c40a21bd5ff</guid>
+    <encode>utf-8</encode>
+	<main dtype="4" dtag="图片">
+	
+		<home>
+		<hots title="最新美女" method="get"   w="4"  h="3"  parse="hots_parse" showImg="2" url="http://pic.91.com/girl/" />			
+			<tags  title="更多美女" method="get" showImg="1" >
+				<item title="全部" url="http://pic.91.com/girl/list_@page.html" />
+			</tags>
+			
+		</home>
+		<tag  cache="0"  method="get"  w="4" h="3" parse="tag_parse" showImg="1" expr="list_" />
+		<book cache="0" method="get"  w="1" h="1" parse="book_parse"  expr="\/girl\/" />
+	
+	</main>
+    <jscript>
+	    <require>
+			<item url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio" />
+		</require>
+		<code>
+        <![CDATA[
+
+var SiteD={};
+
+function utf8_decode(str_data) {
+	var tmp_arr = [], i = 0, ac = 0, c1 = 0, c2 = 0, c3 = 0;
+    str_data += '';
+    while ( i < str_data.length ) {
+        c1 = str_data.charCodeAt(i);
+        if (c1 < 128) {
+            tmp_arr[ac++] = String.fromCharCode(c1);
+            i++;
+        } else if ((c1 > 191) && (c1 < 224)) {
+            c2 = str_data.charCodeAt(i+1);
+            tmp_arr[ac++] = String.fromCharCode(((c1 & 31) << 6) | (c2 & 63));
+            i += 2;
+        } else {
+            c2 = str_data.charCodeAt(i+1);
+            c3 = str_data.charCodeAt(i+2);
+            tmp_arr[ac++] = String.fromCharCode(((c1 & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+            i += 3;
+        }
+    }
+    return tmp_arr.join('');
+}
+
+function urla(u) {
+	if(u){
+		var host = "http://pic.91.com";
+		if (u.indexOf("http")<0) {
+			if (u.substr(0, 1) != '/')
+				u = host + '/' + u;
+			else
+				u = host + u;
+		}
+		return encodeURI(u);
+	}
+	return "";
+}
+
+function htmlEsc(obj) {
+	var arrEntities = {
+		'lt': '<',
+		'gt': '>',
+		'nbsp': ' ',
+		'amp': '&',
+		'quot': '"'
+	};
+	for(var i in obj){
+		var str = obj[i];
+		if(typeof(str) == 'object')
+			str = htmlEsc(str);
+		if(typeof(str) != 'string')
+			continue;
+		obj[i] = str.replace(/<[^<>]+?>/g, '').replace(/&(lt|gt|nbsp|amp|quot);/ig, function(all, t) {
+		return arrEntities[t];
+		}).trim();
+	}
+	return obj;
+}
+
+function hots_parse(url, html) {
+
+	var $ = cheerio.load(html);
+	var list=[];
+	
+		$('ul.list-box li').each(function(){
+		var img = $(this).find('img');
+		var txt= img.parent();
+		var bm = {};
+		bm.name = txt.text();
+		bm.url  = urla(img.parent().attr('href'));
+		bm.logo = img.attr('data-original');
+		bm.author = '';
+		bm.newSection = '';
+		bm.updateTime = '';
+		bm.status='';
+		
+		list.push(bm);
+	});
+	
+  
+	return JSON.stringify(list);
+}
+
+
+function tag_parse(url, html) {
+	
+	
+	var $ = cheerio.load(html);
+	var list=[];
+	
+		$('ul.list-box li').each(function(){
+		var img = $(this).find('img');
+		var txt= img.parent();
+		var bm = {};
+		bm.name = txt.text();
+		bm.url  = urla(img.parent().attr('href'));
+		bm.logo = img.attr('data-original');
+		bm.author = '';
+		bm.newSection = '';
+		bm.updateTime = '';
+		bm.status='';
+		
+		list.push(bm);
+	});
+	
+  
+	return JSON.stringify(list);
+}
+
+function book_parse(url,html)
+{
+
+	var $ = cheerio.load(html);
+	
+	
+
+
+	if(SiteD.ver && SiteD.ver>=25){
+	
+	var list=[];
+
+	$('.small_list li').each(function(){
+		var img = $(this).find('img');
+		
+		list.push(img.attr('data-bigimg'));
+    
+		});
+		return JSON.stringify(htmlEsc(list));	
+    }
+	else
+	{
+	var data = {};
+	data.name = $(".post-head > h2").text().trim();
+	data.sections = [];
+
+
+	$('.small_list li').each(function(){
+		var img = $(this).find('img');
+		
+		var bm = {
+			name: '',
+			url: img.attr('data-bigimg')
+		};
+        data.sections.push(bm);
+        
+		});
+	
+	}
+	return JSON.stringify(htmlEsc(data));
+}
+
+
+
+    ]]>
+		</code>
+    </jscript>
+</site>

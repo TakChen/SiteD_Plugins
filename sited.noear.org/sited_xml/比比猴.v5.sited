@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<site ver="5" debug="1" engine="11">
+    <ua></ua>
+    <title>比比猴</title>
+    <intro>比比猴</intro>
+    <author>seiya</author>
+    <url>http://m.bbhou.com</url>
+    <expr>bbhou\.com</expr>
+    <logo></logo>
+    <encode>utf-8</encode>
+    <main dtype="1">
+        <home>
+            <hots cache="1d" title="热门" method="get" w="3" h="4" parse="hots_parse" 
+	            header="cookie"
+		        buildCookie="site_buildCookie"
+		        buildUrl="site_buildUrl"
+	            url="http://m.bbhou.com/list/Rank"></hots>
+	            
+            <updates cache="1d" title="更新" method="get" parse="updates_parse"  
+	            header="cookie"
+		        buildCookie="site_buildCookie"
+		        buildUrl="site_buildUrl"
+	            url="http://m.bbhou.com/list/Recent"></updates>
+            <tags title="分类">
+                <item group="受众" title="少年漫画" url="http://m.bbhou.com/List/shaonian/?p=@page" />
+                <item title="少女漫画" url="http://m.bbhou.com/list/shaonv/?p=@page" />
+                <item title="青年漫画" url="http://m.bbhou.com/list/qingnian/?p=@page" />
+                
+                <item group="题材" url="http://m.bbhou.com/list/tags/maoxian/?p=@page" title="冒险" />
+				<item url="http://m.bbhou.com/list/tags/huanle/?p=@page" title="欢乐向" />
+				<item url="http://m.bbhou.com/list/tags/gedou/?p=@page" title="格斗" />
+				<item url="http://m.bbhou.com/list/tags/kehuan/?p=@page" title="科幻" />
+				<item url="http://m.bbhou.com/list/tags/aiqing/?p=@page" title="爱情" />
+				<item url="http://m.bbhou.com/list/tags/zhentan/?p=@page" title="侦探" />
+				<item url="http://m.bbhou.com/list/tags/jingji/?p=@page" title="竞技" />
+				<item url="http://m.bbhou.com/list/tags/mofa/?p=@page" title="魔法" />
+				<item url="http://m.bbhou.com/list/tags/shengui/?p=@page" title="东方神鬼" />
+				<item url="http://m.bbhou.com/list/tags/xiaoyuan/?p=@page" title="校园" />
+				<item url="http://m.bbhou.com/list/tags/kongbu/?p=@page" title="恐怖" />
+				<item url="http://m.bbhou.com/list/tags/qita/?p=@page" title="其他" />
+				<item url="http://m.bbhou.com/list/tags/sige/?p=@page" title="四格" />
+				<item url="http://m.bbhou.com/list/tags/shenghuo/?p=@page" title="生活亲情" />
+				<item url="http://m.bbhou.com/list/tags/baihe/?p=@page" title="百合" />
+				<item url="http://m.bbhou.com/list/tags/weiniang/?p=@page" title="伪娘" />
+				<item url="http://m.bbhou.com/list/tags/xuanyi/?p=@page" title="悬疑" />
+				<item url="http://m.bbhou.com/list/tags/danmei/?p=@page" title="耽美" />
+				<item url="http://m.bbhou.com/list/tags/rexue/?p=@page" title="热血" />
+				<item url="http://m.bbhou.com/list/tags/hougong/?p=@page" title="后宫" />
+				<item url="http://m.bbhou.com/list/tags/lishi/?p=@page" title="历史" />
+				<item url="http://m.bbhou.com/list/tags/zhanzheng/?p=@page" title="战争" />
+				<item url="http://m.bbhou.com/list/tags/mengxi/?p=@page" title="萌系" />
+				<item url="http://m.bbhou.com/list/tags/zhaixi/?p=@page" title="宅男腐女" />
+				<item url="http://m.bbhou.com/list/tags/zhiyu/?p=@page" title="治愈" />
+				<item url="http://m.bbhou.com/list/tags/lizhi/?p=@page" title="励志" />
+				<item url="http://m.bbhou.com/list/tags/wuxia/?p=@page" title="武侠" />
+				<item url="http://m.bbhou.com/list/tags/jizhan/?p=@page" title="机战" />
+				<item url="http://m.bbhou.com/list/tags/yinyue/?p=@page" title="音乐舞蹈" />
+				<item url="http://m.bbhou.com/list/tags/meishi/?p=@page" title="美食" />
+				<item url="http://m.bbhou.com/list/tags/zhichang/?p=@page" title="职场" />
+				<item url="http://m.bbhou.com/list/tags/mohuan/?p=@page" title="西方魔幻" />
+				<item url="http://m.bbhou.com/list/tags/gaoqing/?p=@page" title="高清单行本" />
+				<item url="http://m.bbhou.com/list/tags/xingzhuanhuan/?p=@page" title="性转换" />
+				<item url="http://m.bbhou.com/list/tags/touhou/?p=@page" title="东方" />
+				<item url="http://m.bbhou.com/list/tags/futa/?p=@page" title="扶她" />
+				<item url="http://m.bbhou.com/list/tags/mhuan/?p=@page" title="魔幻" />
+				<item url="http://m.bbhou.com/list/tags/qihuan/?p=@page" title="奇幻" />
+				<item url="http://m.bbhou.com/list/tags/jiecao/?p=@page" title="节操" />
+				<item url="http://m.bbhou.com/list/tags/qingxiaoshuo/?p=@page" title="轻小说" />
+				<item url="http://m.bbhou.com/list/tags/yanyi/?p=@page" title="颜艺" />
+				<item url="http://m.bbhou.com/list/tags/gaoxiao/?p=@page" title="搞笑" />
+				<item url="http://m.bbhou.com/list/tags/xianxia/?p=@page" title="仙侠" />
+            </tags>
+        </home>
+        <search cache="1d" method="get"  parse="search_parse" url="http://m.bbhou.com/Search/result.html?keyword=@key" />
+        <tag cache="1d" method="get" header="cookie" parse="tags_parse" />
+        <book cache="1d" method="get" header="cookie" parse="book_parse" expr="manhua" />
+        <section cache="1" method="get" parse="section_parse" header="cookie;referer" />
+    </main>
+    <jscript> 
+	    <require>
+			<item url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio" />
+		</require>  
+	    <code>
+        <![CDATA[
+function urla(u) {
+	var host = "http://m.bbhou.com";
+	if (u.substr(0, 4) != "http") {
+		if (u.substr(0, 1) != '/')
+			return host + '/' + u;
+		else
+			return host + u;
+	}
+	return u;
+}
+
+function htmlEsc(obj) {
+	var arrEntities = {
+		'lt': '<',
+		'gt': '>',
+		'nbsp': ' ',
+		'amp': '&',
+		'quot': '"'
+	};
+	for(var i in obj){
+		var str = obj[i];
+		if(typeof(str) == 'object')
+			str = htmlEsc(str);
+		if(typeof(str) != 'string')
+			continue;
+		obj[i] = str.replace(/<[^<>]+?>/g, '').replace(/&(lt|gt|nbsp|amp|quot);/ig, function(all, t) {
+		return arrEntities[t];
+		}).trim();
+	}
+	return obj;
+}
+
+function stringToHex(str){
+        var val="";
+        for(var i = 0; i < str.length; i++){
+            if(val == "")val = str.charCodeAt(i).toString(16);
+            else val += str.charCodeAt(i).toString(16);
+        }
+        return val;
+    }
+
+function site_buildCookie(url,cookie){
+	var width =400; 
+    var height=800; 
+    var screendate = width + "," + height;
+   
+    return "srcurl=" + stringToHex(url) + ";path=/;";
+}
+
+function site_buildUrl(url){ 
+    var width =400; 
+    var height=800; 
+    var screendate = width + "," + height;
+    
+    return url+ "?security_verify_data=" + stringToHex(screendate);
+}
+
+function hots_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('li.section1').each(function(){
+		var item = $(this); 
+		
+		var img = item.find('img');
+		
+		var bm = {};
+		bm.name = img.attr('alt');
+		bm.url  = urla(img.parent().attr('href'));
+		bm.logo = img.attr('src');
+
+		list.push(bm);
+	});
+
+	return JSON.stringify(list);
+}
+
+function updates_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('li.section1').each(function(){
+		var item = $(this); 
+		
+		var img = item.find('img');
+		
+		var bm = {};
+		bm.name = img.attr('alt');
+		bm.url  = urla(img.parent().attr('href'));
+		bm.logo = img.attr('src');
+		
+		bm.author = item.find('.con p').eq(1).text().trim();
+		bm.newSection = item.find('span.h').text().trim();
+		bm.updateTime = item.find('span.color_red').text().trim();
+		bm.status = '';
+
+		list.push(bm);
+	});
+
+	return JSON.stringify(list);
+}
+
+function search_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('li.section1').each(function(){
+		var item = $(this); 
+		
+		var img = item.find('img');
+		
+		var bm = {};
+		bm.name = img.attr('alt');
+		bm.url  = urla(img.parent().attr('href'));
+		bm.logo = img.attr('src');
+		
+		bm.author = item.find('.con p').eq(1).text().trim();
+		bm.newSection = item.find('span.h').text().trim();
+		bm.updateTime = item.find('span.color_red').text().trim();
+		bm.status = '';
+
+		list.push(bm);
+	});
+
+	return JSON.stringify(list);
+}
+
+
+
+function tags_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+	
+	$('li.section1').each(function(){
+		var item = $(this); 
+		
+		var img = item.find('img');
+		
+		var bm = {};
+		bm.name = img.attr('alt');
+		bm.url  = urla(img.parent().attr('href'));
+		bm.logo = img.attr('src');
+		
+		bm.author = item.find('.con p').eq(1).text().trim();
+		bm.newSection = item.find('span.h').text().trim();
+		bm.updateTime = item.find('span.color_red').text().trim();
+		bm.status = '';
+		
+		list.push(bm);
+	});
+	
+	return JSON.stringify(htmlEsc(list));
+}
+
+function book_parse(url, html) {
+	var data = {};
+	
+	data.name = html.match(/<h1>.*?<\/h1>/)[0];
+	data.author = html.match(/<p>作者：(.*?)<\/p>/)[1];
+	data.logo = html.match(/<img id="cover_pic" src="(.*?)"/)[1];
+	data.updateTime = '';
+	data.intro = html.match(/<div\s*class="ilist">([\w\W]*?)<\/div>/)[1];
+	
+	data.sections = [];
+
+	var script = html.match(/(var\schapter_list\s=[\w\W]*?)<\/script>/)[1];
+	eval(script);
+	for(var group in chapter_list){
+		for(var item_i in chapter_list[group]){
+			var item = chapter_list[group][item_i];
+			if(!item.match(/href\s*=\s*"(.*?)"/i))
+				continue;
+			var s = {
+				url: urla(item.match(/href\s*=\s*"(.*?)"/i)[1]),
+				name: item.match(/>(.*?)</i)[1]
+			};
+			data.sections.push(s);
+		}
+	}
+	data.sections.reverse();
+	return JSON.stringify(htmlEsc(data));
+}
+
+function section_parse(url, html) {
+	var listJS = html.match(/var imglist = .*?;/gi)[0];
+	eval(listJS);
+
+	var img_host = "http://hicomic.bbhou.com";
+	
+	var list = [];
+	for (var i = 0; i < imglist.length; i++) {
+		list.push(img_host + imglist[i]);
+	}
+
+	return JSON.stringify(list);
+}
+            ]]>
+    	</code>
+    </jscript>
+</site>

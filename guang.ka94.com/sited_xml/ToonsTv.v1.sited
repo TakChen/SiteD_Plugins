@@ -1,0 +1,121 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<site ver="1" debug="1" engine="24" >
+    <ua></ua>
+	<title>ToonsTv</title>
+    <intro>[动画]愤怒的小鸟系列及家族的卡通TV。ToonsTV is the home of the wildly popular Angry Birds Toons series and hand-selected family entertainment shows from around the world.Sit back and enjoy the hilarious adventures of the birds and pigs in Angry Birds Toons and so on.</intro>
+    <author>Guang</author>
+    <url>https://www.toons.tv/</url>
+    <expr>\.toons\.tv</expr>
+    <logo></logo>
+    <encode>UTF-8</encode>
+	<main dtype="3"  btag="动画">
+		<reward title="打赏" mail="wistn@qq.com">
+			<item txt="插件开发者@Guang的账号" />
+			<item />
+			<item title="支付宝[❤❤广]" url="wistn@qq.com" />
+			<item />
+			<item txt="感谢你对此插件开发者的支持"/>
+		</reward>
+		<home>
+			<hots title="频道" showImg="1"  w="1" h="1.33" cache="1d"  method="get"  parse="hots_parse" url="https://www.toons.tv/"  />
+			<updates title="精选视频" showImg="1"  w="1.75" h="1" cache="1d" method="get" parse="updates_parse" url="https://www.toons.tv/" />			
+		</home>
+		<book>
+        <book cache="1d"    method="get"  parse="book_parse"  expr="\/channels\/[^/]+\/$" dtype="3" />
+        <book cache="1d"    method="get"  parse="section_parse"  expr="\/channels\/[^/]+\/[^/]+" dtype="7" />
+		</book>
+        <section cache="1d"  method="get"  parse="section_parse"  />
+    </main>
+    <jscript>
+	    <require>
+			<item url="http://sited.noear.org/addin/js/cheerio.js" lib="cheerio" />
+		</require>
+		<code>
+        <![CDATA[
+function urla(u) {
+	var host = "https://www.toons.tv";
+	if (u.indexOf("https") < 0) {
+		if (u.substr(0, 1) != '/')
+			u = host + '/' + u;
+		else
+			u = host + u;
+	}
+	return encodeURI(u);
+}
+function hots_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+
+	$('.all-channels-section>div>div.channel-panel').each(function () {
+		var item = $(this);
+		var bm = {};
+		var videourl = item.find('a').attr('href');
+
+		bm.name = videourl.match(/channels\/(.+)\//i)[1];
+		bm.url = urla(videourl);
+		bm.logo = item.find('.channel-panel__overlay').attr('style').match(/(http.+?)\"/i)[1];
+
+		list.push(bm);
+	});
+	return JSON.stringify(list);
+}
+
+function updates_parse(url, html) {
+	var $ = cheerio.load(html);
+	var list = [];
+
+	$('.featured-videos-section>div>div.video-panel').each(function () {
+		var item = $(this);
+		var bm = {};
+		var videourl = item.find('a').attr('href');
+
+		bm.name = '所属频道';
+		bm.url = urla(videourl);
+		bm.logo = item.attr('style').match(/(http.+?)\"/i)[1];
+		bm.newSection = '';
+		bm.updateTime = videourl.match(/\/channels\/([^/]+)\//)[1];
+		list.push(bm);
+	});
+	return JSON.stringify(list);
+}
+
+function book_parse(url, html) {
+	var $ = cheerio.load(html);
+	var data = {};
+
+	data.name = url.match(/\/channels\/([^/]+)\//)[1];
+	data.author = '';
+	data.logo = '';
+	data.intro = '';
+	data.updateTime = "";
+	data.isSectionsAsc = 0;
+	data.sections = [];
+
+	var js = html.match(/bundled-json.+?({.+?})<\/script>/i)[1];
+	var json = JSON.parse(js);
+
+	for (var i in json.dataView.activeChannel.videos) {
+		var item = json.dataView.activeChannel.videos[i];
+
+		var bm = {
+			name : item.title,
+			url : url.replace(/(https.+\/channels\/[^/]+\/).*/i, '$1') + item.id
+		};
+		data.sections.push(bm);
+	}
+	return JSON.stringify(data);
+}
+
+function section_parse(url, html) {
+	var curl = html.match(/renditions.+(http.+?\.mp4)/i)[1];
+	return JSON.stringify([{
+				url : curl,
+				type : ".mp4",
+				mime : "vedio/mp4"
+			}
+		]);
+}
+]]>
+		</code>
+    </jscript>
+</site>
